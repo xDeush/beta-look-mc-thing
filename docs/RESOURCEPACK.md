@@ -1,5 +1,39 @@
 # Resourcepack
 
+## Uzycie w trzech krokach
+
+```bat
+:: 1. Ukryj wszystko, czego nie bylo w becie (czyta Twoj jar 26.2)
+python tools\gen_hide_pack.py "%APPDATA%\.minecraft\versions\26.2\26.2.jar"
+
+:: 2. Ujednolic drewno -- cherry, mangrove, bamboo... beda wygladac jak dab
+python tools\gen_wood_overrides.py
+
+:: 3. (opcjonalnie) Tekstury z Twojej kopii bety
+pip install pillow
+python tools\extract_beta_textures.py "%APPDATA%\.minecraft\versions\b1.7.3\b1.7.3.jar"
+
+:: 4. Spakuj
+python tools\build_pack.py
+```
+
+Powstaje `build\BetaLook.zip`. Wrzuc go do
+`%APPDATA%\.minecraft\resourcepacks`, wejdz w grze w
+**Opcje -> Pakiety zasobow** i przesun go na prawa strone.
+
+### Czemu skrypt do pakowania, a nie zwykly zip
+
+Klikniecie prawym na folderze `resourcepack` i "wyslij do -> folder
+skompresowany" pakuje **folder**, a nie jego zawartosc. Minecraft widzi
+wtedy zipa, w ktorym na wierzchu jest katalog `resourcepack`, nie znajduje
+`pack.mcmeta` i pack **w ogole nie pojawia sie na liscie**. To najczestszy
+blad przy recznym pakowaniu. `build_pack.py` pakuje zawartosc.
+
+### Kroki 1 i 2 mozna robic bez moda
+
+Sam pack juz ukrywa bloki i itemy oraz ujednolica drewno. Mod dokłada
+mgle, swiatlo, animacje i ukrywanie mobow -- czyli to, czego pack nie potrafi.
+
 ## Skad tekstury
 
 Z **twojej wlasnej** kopii `b1.7.3.jar`. Mojang nie pozwala redystrybuowac swoich
@@ -39,4 +73,11 @@ gdzie model jest generowany w kodzie, a nie z JSON-a.
 - nie tnie `gui/items.png` na pojedyncze itemy (trzeba dopisac mape jak dla terrain)
 - nie obsluguje animowanych tekstur (woda/lawa w becie byly generowane
   proceduralnie w kodzie, nie jako klatki PNG)
-- nie generuje `pack.png`
+- nie generuje `pack.png` (ikonka packa na liscie -- czysto kosmetyczne)
+
+## pack_format
+
+`gen_hide_pack.py` odczytuje go z `version.json` w Twoim jarze i wpisuje
+do `pack.mcmeta` sam. Wczesniej byla tam liczba wpisana na sztywno, co jest
+najczestsza przyczyna komunikatu "pack jest niezgodny z ta wersja" --
+Mojang podnosi ten numer niemal z kazdym wydaniem.

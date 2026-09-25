@@ -35,6 +35,28 @@ def read_ids(jar: zipfile.ZipFile, folder: str) -> set[str]:
     }
 
 
+def pack_format(jar: zipfile.ZipFile) -> int | None:
+    """
+    Czyta wersje formatu resourcepacka z version.json w jarze gry.
+
+    Zgadywanie tej liczby jest najczestsza przyczyna komunikatu
+    "pack jest niezgodny z ta wersja" -- Mojang podnosi ja niemal
+    z kazdym wydaniem, wiec lepiej ja odczytac niz wpisywac na sztywno.
+    """
+    try:
+        with jar.open("version.json") as fh:
+            meta = json.load(fh)
+    except (KeyError, json.JSONDecodeError):
+        return None
+
+    version = meta.get("pack_version")
+    if isinstance(version, dict):
+        return version.get("resource")
+    if isinstance(version, int):
+        return version
+    return None
+
+
 def write(path: pathlib.Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n")
@@ -55,6 +77,7 @@ def main() -> None:
         # Od 1.21.4 definicje modeli itemow siedza w assets/minecraft/items/.
         item_defs = read_ids(jar, "items")
         legacy_items = read_ids(jar, "models/item") if not item_defs else set()
+        fmt = pack_format(jar)
 
     if not all_blocks:
         sys.exit("W jarze nie ma assets/minecraft/blockstates/ -- zly plik?")
@@ -80,6 +103,19 @@ def main() -> None:
         print("\nprzykladowe bloki:", ", ".join(hide_blocks[:12]))
         print("przykladowe itemy:", ", ".join(hide_items[:12]))
         return
+
+    if fmt is None:
+        print("UWAGA: nie odczytalem pack_format z version.json -- zostawiam "
+              "to, co jest w pack.mcmeta. Jesli gra powie, ze pack jest "
+              "niezgodny, popraw ta liczbe recznie.")
+    else:
+        write(PACK.parent.parent / "pack.mcmeta", {
+            "pack": {
+                "pack_format": fmt,
+                "description": "BetaLook - wyglad Minecraft Beta 1.7.3",
+            },
+        })
+        print(f"pack_format odczytany z jara: {fmt}")
 
     # Pusty model: brak "elements" znaczy zero geometrii, czyli nic sie nie rysuje.
     write(PACK / "models" / "block" / "betalook_empty.json", {})
