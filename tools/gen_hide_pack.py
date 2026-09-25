@@ -63,6 +63,29 @@ def pack_format(jar: zipfile.ZipFile) -> int | None:
     return None
 
 
+def blockstate(block: str, beta: str) -> dict:
+    """
+    Blockstate kierujacy blok na model betowego odpowiednika.
+
+    Bloki osiowe (bale, drewno, lodygi) musza zachowac obroty, inaczej kazdy
+    bal lezy pionowo niezaleznie od tego, jak zostal postawiony.
+    """
+    model = f"minecraft:block/{beta}"
+
+    if block.endswith(("_log", "_wood", "_stem", "_hyphae")):
+        return {
+            "variants": {
+                "axis=y": {"model": model},
+                "axis=z": {"model": model, "x": 90},
+                "axis=x": {"model": model, "x": 90, "y": 90},
+            }
+        }
+
+    # Pusty klucz wariantu lapie kazdy stan bloku, wiec nie musimy znac
+    # jego wlasciwosci.
+    return {"variants": {"": {"model": model}}}
+
+
 def write(path: pathlib.Path, data: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2) + "\n")
@@ -73,6 +96,8 @@ def main() -> None:
     ap.add_argument("jar", type=pathlib.Path, help="jar wersji, na ktorej grasz")
     ap.add_argument("--dry-run", action="store_true",
                     help="tylko pokaz, ile czego zostaloby ukryte")
+    ap.add_argument("--explain", metavar="BLOK",
+                    help="powiedz, co pack robi z tym blokiem, i wyjdz")
     args = ap.parse_args()
 
     if not args.jar.is_file():
@@ -104,6 +129,22 @@ def main() -> None:
     # dziury w ziemi -- swiat wyglada na zniszczony, nie na betowy.
     substitute = {b: SUBSTITUTIONS[b] for b in all_blocks if b in SUBSTITUTIONS}
 
+    # Drewno: wymuszamy blockstate, a nie tylko model.
+    #
+    # gen_wood_overrides.py nadpisuje models/block/cherry_planks.json, co
+    # dziala tylko dopoki waniliowy blockstate wskazuje wlasnie na ten model.
+    # Gdy wskazuje gdzie indziej, zmiane widac WYLACZNIE na ikonie w GUI
+    # (bo item model idzie inna sciezka), a postawiony blok zostaje bez zmian.
+    # Wskazanie wprost na model debu omija ten problem calkiem.
+    for block in all_blocks:
+        target = unify(block)
+        if target == block or target not in all_blocks:
+            continue
+        if block.endswith(("_log", "_wood", "_stem", "_hyphae")):
+            substitute.setdefault(block, target)
+        elif block.endswith(("_planks", "_leaves")):
+            substitute.setdefault(block, target)
+
     hide_blocks = sorted(
         b for b in all_blocks
         if not keep(b, BETA_BLOCKS) and b not in substitute)
@@ -114,6 +155,22 @@ def main() -> None:
     print(f"bloki w jarze:   {len(all_blocks):5d}  -> ukrywam {len(hide_blocks)},"
           f" podstawiam {len(substitute)}")
     print(f"itemy w jarze:   {len(item_defs or legacy_items):5d}  -> ukrywam {len(hide_items)}")
+
+    if args.explain:
+        name = args.explain
+        print(f"blok: {name}")
+        if name not in all_blocks:
+            print("  NIE MA go w tym jarze -- zla nazwa albo zla wersja gry")
+        elif name in substitute:
+            print(f"  PODSTAWIANY -> renderuje sie jak {substitute[name]}")
+            print(f"  plik: assets/minecraft/blockstates/{name}.json")
+            print(f"  tresc: {json.dumps(blockstate(name, substitute[name]))}")
+        elif keep(name, BETA_BLOCKS):
+            print("  ZOSTAWIONY bez zmian -- jest na liscie blokow bety")
+        else:
+            print("  UKRYWANY -> pusty model, nic sie nie rysuje")
+            print(f"  plik: assets/minecraft/blockstates/{name}.json")
+        return
 
     if args.dry_run:
         print("\nukrywane:   ", ", ".join(hide_blocks[:12]))
@@ -145,8 +202,7 @@ def main() -> None:
               {"variants": {"": {"model": EMPTY_MODEL}}})
 
     for block, beta in sorted(substitute.items()):
-        write(PACK / "blockstates" / f"{block}.json",
-              {"variants": {"": {"model": f"minecraft:block/{beta}"}}})
+        write(PACK / "blockstates" / f"{block}.json", blockstate(block, beta))
 
     for item in hide_items:
         if item_defs:

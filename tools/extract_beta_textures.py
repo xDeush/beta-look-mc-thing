@@ -54,6 +54,18 @@ DIRECT = {
 }
 
 
+def is_blank(tile_img) -> bool:
+    """
+    Czy kafelek jest w calosci przezroczysty.
+
+    To straznik przed zla mapa indeksow: jesli wskazemy pusty kafelek,
+    tekstura docelowa staje sie niewidzialna i blok znika z gry -- co
+    wyglada jak blad moda, a jest blednym numerem w terrain_map.json.
+    """
+    alpha = tile_img.getchannel("A")
+    return alpha.getextrema()[1] == 0
+
+
 def slice_atlas(img, index, tile=16):
     per_row = img.width // tile
     x = (index % per_row) * tile
@@ -85,11 +97,28 @@ def main():
         with jar.open("terrain.png") as fh:
             terrain = Image.open(fh).convert("RGBA")
 
+        blank = []
         for index, dest in sorted(mapping.items()):
+            piece = slice_atlas(terrain, index, args.tile)
+
+            if is_blank(piece):
+                blank.append((index, dest))
+                continue
+
             target = OUT / f"{dest}.png"
             target.parent.mkdir(parents=True, exist_ok=True)
-            slice_atlas(terrain, index, args.tile).save(target)
+            piece.save(target)
             written += 1
+
+        if blank:
+            print()
+            print(f"POMINIETO {len(blank)} pustych kafelkow -- zle numery "
+                  f"w tools/terrain_map.json:")
+            for index, dest in blank:
+                print(f"  kafelek {index} -> {dest}")
+            print("Zapisanie ich zrobiloby te bloki NIEWIDZIALNYMI w grze.")
+            print("Zobacz wlasciwe numery: python3 tools/index_terrain.py <jar>")
+            print()
 
         for src, dest in DIRECT.items():
             if src not in names:
