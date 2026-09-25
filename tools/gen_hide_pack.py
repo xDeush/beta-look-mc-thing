@@ -221,9 +221,18 @@ def main() -> None:
         return
 
     if fmt is None:
-        print("UWAGA: nie odczytalem pack_format z version.json -- zostawiam "
-              "to, co jest w pack.mcmeta. Jesli gra powie, ze pack jest "
-              "niezgodny, popraw ta liczbe recznie.")
+        # Nie znamy numeru, wiec deklarujemy szeroki zakres obslugiwanych
+        # formatow. Gra przyjmie pack zamiast oznaczac go jako niezgodny.
+        print("UWAGA: nie odczytalem pack_format z version.json.")
+        print("       Wpisuje szeroki zakres supported_formats, zeby gra")
+        print("       przyjela pack mimo to.")
+        write(PACK.parent.parent / "pack.mcmeta", {
+            "pack": {
+                "pack_format": 64,
+                "supported_formats": {"min_inclusive": 15, "max_inclusive": 200},
+                "description": "BetaLook - wyglad Minecraft Beta 1.7.3",
+            },
+        })
     else:
         write(PACK.parent.parent / "pack.mcmeta", {
             "pack": {

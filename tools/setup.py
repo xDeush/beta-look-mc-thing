@@ -81,6 +81,22 @@ def default_mc_dir() -> pathlib.Path | None:
     return pathlib.Path.home() / ".minecraft"
 
 
+def mod_target_version() -> str | None:
+    """Wersja, pod ktora zbudowany jest mod -- z gradle.properties."""
+    props = ROOT / "gradle.properties"
+    if not props.is_file():
+        return None
+    for line in props.read_text().splitlines():
+        if line.startswith("minecraft_version="):
+            return line.split("=", 1)[1].strip()
+    return None
+
+
+def is_snapshot(name: str) -> bool:
+    lowered = name.lower()
+    return any(mark in lowered for mark in ("snapshot", "pre", "rc", "experimental"))
+
+
 def version_key(name: str) -> tuple:
     """Sortowanie wersji: 26.10 jest nowsze niz 26.2, a nie odwrotnie."""
     return tuple(int(p) for p in re.findall(r"\d+", name)) or (0,)
@@ -139,11 +155,42 @@ def find_game_jar(roots: list[pathlib.Path], wanted: str | None) -> pathlib.Path
     vanilla = [j for j in candidates if is_vanilla_jar(j)]
     if not vanilla:
         return None
-    return max(vanilla, key=lambda p: version_key(p.parent.name))
+
+    # Najpierw szukamy wersji, pod ktora zbudowany jest mod. Grubo mylace
+    # jest wziecie nowszej: listy blokow i itemow roznia sie miedzy wydaniami,
+    # wiec pack wygenerowany z innego jara ukrywa i podstawia nie to co trzeba.
+    target = mod_target_version()
+    if target:
+        exact = [j for j in vanilla if j.parent.name == target]
+        if exact:
+            return exact[0]
+
+    # Potem stabilne wydania, dopiero na koncu snapshoty.
+    stable = [j for j in vanilla if not is_snapshot(j.parent.name)]
+    pool = stable or vanilla
+    return max(pool, key=lambda p: version_key(p.parent.name))
 
 
-def is_beta_jar(path: pathlib.Path) -> bool:
-    """Jar bety poznajemy po terrain.png -- atlasie, ktory zniknal w 1.5."""
+def beta_rank(name: str) -> int | None:
+    """
+    Jak dobrze nazwa wersji pasuje do bety. Nizej znaczy lepiej, None odrzuca.
+
+    Sam terrain.png nie wystarcza: ten atlas przetrwal az do 1.4, wiec jar
+    z 1.0 przechodzil test i podmienial tekstury na o wiele nowsze niz betowe.
+    """
+    lowered = name.lower()
+    if lowered.startswith("b1.7.3"):
+        return 0
+    if lowered.startswith("b1."):
+        return 1
+    if lowered.startswith("beta"):
+        return 2
+    if lowered.startswith("a1."):
+        return 3
+    return None
+
+
+def has_terrain_atlas(path: pathlib.Path) -> bool:
     try:
         with zipfile.ZipFile(path) as jar:
             return "terrain.png" in jar.namelist()
@@ -156,11 +203,15 @@ def find_beta_jar(roots: list[pathlib.Path], given: str | None) -> pathlib.Path 
         jar = pathlib.Path(given)
         return jar if jar.is_file() else None
 
+    best: tuple[int, pathlib.Path] | None = None
     for root in roots:
         for jar in jar_candidates(root):
-            if is_beta_jar(jar):
-                return jar
-    return None
+            rank = beta_rank(jar.parent.name)
+            if rank is None or not has_terrain_atlas(jar):
+                continue
+            if best is None or rank < best[0]:
+                best = (rank, jar)
+    return best[1] if best else None
 
 
 def run(script: str, *args: str) -> bool:
@@ -247,6 +298,16 @@ def main() -> None:
     if args.dry_run:
         print("\n--dry-run: nic nie zapisuje.")
         return
+
+    # Sprzatamy to, co wygenerowal poprzedni przebieg. Bez tego tekstury
+    # wyciagniete ze zlego jara i wpisy dla blokow z innej wersji gry
+    # zostawaly w packu i cicho mieszaly sie z nowymi.
+    generated = ROOT / "resourcepack" / "assets" / "minecraft"
+    for folder in ("textures", "blockstates", "items", "models"):
+        target = generated / folder
+        if target.is_dir():
+            shutil.rmtree(target)
+            print(f"Usunieto stare: {target}")
 
     if not run("gen_hide_pack.py", str(game_jar)):
         sys.exit("gen_hide_pack.py nie przeszedl -- przerywam.")
