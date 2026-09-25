@@ -12,7 +12,6 @@ w ktorym na wierzchu jest katalog "resourcepack", nie znajduje pack.mcmeta
 i pack w ogole nie pojawia sie na liscie.
 """
 import pathlib
-import shutil
 import sys
 import zipfile
 
@@ -22,8 +21,27 @@ OUT = ROOT / "build" / "BetaLook.zip"
 
 
 def main() -> None:
+    force = "--force" in sys.argv
+
     if not (SRC / "pack.mcmeta").is_file():
         sys.exit(f"Brakuje {SRC / 'pack.mcmeta'} -- uruchom najpierw gen_hide_pack.py")
+
+    # Bez blockstates pack nie ukrywa ani nie podstawia NICZEGO -- zawiera
+    # wtedy same nadpisania modeli drewna, ktore dzialaja polowicznie.
+    # Wczesniej taki pack pakowal sie bez slowa i w grze wygladal na zepsuty.
+    blockstates = SRC / "assets" / "minecraft" / "blockstates"
+    if not force and (not blockstates.is_dir() or not any(blockstates.glob("*.json"))):
+        sys.exit(
+            "BLAD: brak assets/minecraft/blockstates -- pack nie ukrywalby\n"
+            "      ani nie podstawial zadnego bloku.\n"
+            "\n"
+            "Uruchom najpierw:\n"
+            "  python tools/gen_hide_pack.py <sciezka do jara Twojej wersji gry>\n"
+            "\n"
+            "Nie wiesz, gdzie jest jar? Zobacz, jakie masz wersje:\n"
+            "  dir /b \"%APPDATA%\\.minecraft\\versions\"\n"
+            "\n"
+            "Jesli swiadomie chcesz pack z samymi teksturami: --force")
 
     textures = SRC / "assets" / "minecraft" / "textures"
     if not textures.is_dir():

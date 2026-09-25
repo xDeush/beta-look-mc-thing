@@ -101,7 +101,19 @@ def main() -> None:
     args = ap.parse_args()
 
     if not args.jar.is_file():
-        sys.exit(f"Nie ma takiego pliku: {args.jar}")
+        sys.exit(
+            f"Nie ma takiego pliku: {args.jar}\n"
+            "\n"
+            "Bez jara gry nie wiem, jakie bloki istnieja w Twojej wersji,\n"
+            "wiec nie mam czego ukrywac ani podstawiac.\n"
+            "\n"
+            "Zobacz, jakie wersje masz zainstalowane:\n"
+            "  Windows:  dir /b \"%APPDATA%\\.minecraft\\versions\"\n"
+            "  Linux:    ls ~/.minecraft/versions\n"
+            "\n"
+            "Jar lezy w versions\\<nazwa>\\<nazwa>.jar. Jesli folderu wersji\n"
+            "nie ma wcale -- odpal ta wersje raz w launcherze, wtedy sie pobierze.\n"
+            "Uzywasz Prism/MultiMC? Jar jest w katalogu instancji, nie w .minecraft.")
 
     with zipfile.ZipFile(args.jar) as jar:
         all_blocks = read_ids(jar, "blockstates")
