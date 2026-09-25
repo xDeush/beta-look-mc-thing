@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-Rysuje terrain.png z numerami kafelkow, zebys mogl poprawic terrain_map.json.
+Rysuje atlas bety z numerami kafelkow, zebys mogl poprawic mape indeksow.
 
-    python3 tools/index_terrain.py ~/.minecraft/versions/b1.7.3/b1.7.3.jar
+    python3 tools/index_atlas.py <jar bety>                          # terrain.png
+    python3 tools/index_atlas.py <jar bety> --atlas gui/items.png    # itemy
 
-Wynik: build/terrain_indexed.png -- atlas powiekszony 8x, z numerem
-na kazdym kafelku i aktualnym przypisaniem z terrain_map.json pod spodem.
+Wynik: build/<nazwa>_indexed.png -- atlas powiekszony 8x, z numerem na kazdym
+kafelku i aktualnym przypisaniem pod spodem, na szachownicy (zeby bylo widac,
+ktore kafelki sa przezroczyste).
 
-Po co: mapa indeksow w tym repo jest w duzej czesci zgadywana. Zamiast
-zgadywac dalej, otwierasz ten obrazek, widzisz gdzie faktycznie sa liscie,
-i poprawiasz jedna linijke w terrain_map.json.
+Po co: mapy indeksow w tym repo sa w czesci zgadywane. Zamiast zgadywac dalej,
+otwierasz obrazek, widzisz gdzie faktycznie sa liscie albo kilof, i poprawiasz
+jedna linijke w terrain_map.json / items_map.json.
 """
 import argparse
 import json
@@ -23,24 +25,34 @@ except ImportError:
     sys.exit("Potrzebny Pillow:  pip install pillow")
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-OUT = ROOT / "build" / "terrain_indexed.png"
 SCALE = 8
+
+MAPS = {
+    "terrain.png": "terrain_map.json",
+    "gui/items.png": "items_map.json",
+}
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("jar", type=pathlib.Path)
+    ap.add_argument("--atlas", default="terrain.png", choices=sorted(MAPS))
     ap.add_argument("--tile", type=int, default=16)
     args = ap.parse_args()
+
+    out = ROOT / "build" / (
+        pathlib.Path(args.atlas).stem + "_indexed.png")
 
     if not args.jar.is_file():
         sys.exit(f"Nie ma takiego pliku: {args.jar}")
 
-    mapping = json.loads((ROOT / "tools" / "terrain_map.json").read_text())
+    mapping = json.loads((ROOT / "tools" / MAPS[args.atlas]).read_text())
     mapping = {int(k): v for k, v in mapping.items() if k.isdigit()}
 
     with zipfile.ZipFile(args.jar) as jar:
-        with jar.open("terrain.png") as fh:
+        if args.atlas not in jar.namelist():
+            sys.exit(f"W jarze nie ma {args.atlas} -- czy to jar bety?")
+        with jar.open(args.atlas) as fh:
             terrain = Image.open(fh).convert("RGBA")
 
     per_row = terrain.width // args.tile
@@ -69,9 +81,9 @@ def main() -> None:
             draw.text((x + 3, y + cell - 12),
                       mapping[index].split("/")[-1][:14], fill=(0, 0, 255, 255))
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    board.save(OUT)
-    print(f"Zapisano {OUT}")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    board.save(out)
+    print(f"Zapisano {out}")
     print("Czerwone = numer kafelka. Niebieskie = obecne przypisanie.")
     print("Puste pola w szachownice = kafelek przezroczysty.")
 

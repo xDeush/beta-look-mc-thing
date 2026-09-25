@@ -31,6 +31,16 @@ PACK = ROOT / "resourcepack" / "assets" / "minecraft"
 EMPTY_MODEL = "minecraft:block/betalook_empty"
 
 
+def read_models(jar: zipfile.ZipFile) -> set[str]:
+    """Modele blokow obecne w jarze, np. "stone", "oak_log"."""
+    prefix = "assets/minecraft/models/block/"
+    return {
+        name[len(prefix):-len(".json")]
+        for name in jar.namelist()
+        if name.startswith(prefix) and name.endswith(".json")
+    }
+
+
 def read_ids(jar: zipfile.ZipFile, folder: str) -> set[str]:
     """Nazwy plikow .json w danym katalogu assetow, bez rozszerzenia."""
     prefix = f"assets/minecraft/{folder}/"
@@ -120,6 +130,7 @@ def main() -> None:
         # Od 1.21.4 definicje modeli itemow siedza w assets/minecraft/items/.
         item_defs = read_ids(jar, "items")
         legacy_items = read_ids(jar, "models/item") if not item_defs else set()
+        models = read_models(jar)
         fmt = pack_format(jar)
 
     if not all_blocks:
@@ -157,15 +168,33 @@ def main() -> None:
         elif block.endswith(("_planks", "_leaves")):
             substitute.setdefault(block, target)
 
+    # Podstawienie wskazujace na nieistniejacy model daje blok NIEWIDZIALNY,
+    # a nie podstawiony. Dokladnie tak znikaly liscie przy zlej mapie tekstur.
+    # Kazdy cel sprawdzamy wiec wzgledem modeli, ktore sa w jarze.
+    broken = {b: m for b, m in substitute.items() if m not in models}
+    for block in broken:
+        del substitute[block]
+
     hide_blocks = sorted(
         b for b in all_blocks
-        if not keep(b, BETA_BLOCKS) and b not in substitute)
+        if not keep(b, BETA_BLOCKS) and b not in substitute and b not in broken)
     hide_items = sorted(
         i for i in (item_defs or legacy_items)
         if not keep(i, BETA_ITEMS) and i not in SUBSTITUTIONS)
 
     print(f"bloki w jarze:   {len(all_blocks):5d}  -> ukrywam {len(hide_blocks)},"
           f" podstawiam {len(substitute)}")
+    if broken:
+        print()
+        print(f"ODRZUCONO {len(broken)} podstawien -- cel nie istnieje "
+              f"jako model w tej wersji gry:")
+        for block, target in sorted(broken.items()):
+            print(f"  {block} -> {target}  (brak models/block/{target}.json)")
+        print("Te bloki zostawiam WANILIOWE -- nie ukrywam ich.")
+        print("Blok w oryginalnej teksturze wyglada gorzej niz betowy,")
+        print("ale dziura w ziemi wyglada gorzej od obu.")
+        print("Popraw cele w tools/substitutions.json.")
+        print()
     print(f"itemy w jarze:   {len(item_defs or legacy_items):5d}  -> ukrywam {len(hide_items)}")
 
     if args.explain:

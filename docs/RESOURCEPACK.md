@@ -89,10 +89,31 @@ Dziala na poziomie resourcepacka, wiec zadziala tez bez moda.
 Mod robi to samo niezaleznie (`BetaContent.unifyWood`) -- dla przypadkow,
 gdzie model jest generowany w kodzie, a nie z JSON-a.
 
+## Gdy tekstura wyglada zle albo blok znika
+
+Mapy indeksow (`tools/terrain_map.json`, `tools/items_map.json`) sa w czesci
+zgadywane. Zly numer = wyciety nie ten kafelek, albo kafelek pusty -- a pusta
+tekstura znaczy w grze NIEWIDZIALNY blok.
+
+Dwie rzeczy temu zapobiegaja:
+
+1. Skrypt **pomija puste kafelki** i wypisuje, ktore numery sa zle.
+   Zla mapa nie moze juz cicho zrobic niewidzialnego bloku.
+2. Podglad z numerami:
+
+```bash
+python3 tools/index_atlas.py <jar bety>                        # terrain.png
+python3 tools/index_atlas.py <jar bety> --atlas gui/items.png  # itemy
+```
+
+Powstaje `build/<nazwa>_indexed.png`: atlas powiekszony 8x, czerwone numery
+kafelkow, niebieskie obecne przypisania, szachownica pod spodem pokazuje
+przezroczystosc. Widzisz, ze liscie sa pod 52, a w mapie masz 66 -- poprawiasz
+jedna linijke.
+
 ## Czego skrypt jeszcze nie robi
 
-- nie tnie `gui/items.png` na pojedyncze itemy (trzeba dopisac mape jak dla terrain)
-- nie obsluguje animowanych tekstur (woda/lawa w becie byly generowane
+- nie obsluguje animowanych tekstur (woda i lawa w becie byly generowane
   proceduralnie w kodzie, nie jako klatki PNG)
 - nie generuje `pack.png` (ikonka packa na liscie -- czysto kosmetyczne)
 

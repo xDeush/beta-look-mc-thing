@@ -34,6 +34,9 @@ public final class BetaDiagnostics {
             "net.minecraft.world.entity.Entity",
             "net.minecraft.client.renderer.GameRenderer",
             "net.minecraft.client.renderer.entity.state.HumanoidRenderState",
+            // Potrzebne do dwoch ostatnich modulow: smooth lighting i czastek.
+            "net.minecraft.client.renderer.block.BlockModelLighter",
+            "net.minecraft.client.particle.ParticleEngine",
     };
 
     public static void dump() {

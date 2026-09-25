@@ -48,7 +48,6 @@ DIRECT = {
     "mob/pigzombie.png": "entity/zombie_pigman",
     "mob/enderman.png": "entity/enderman/enderman",
     "art/kz.png": "painting/paintings",
-    "gui/items.png": "_atlas/items",
     "gui/gui.png": "gui/widgets",
     "gui/icons.png": "gui/icons",
 }
@@ -110,15 +109,27 @@ def main():
             piece.save(target)
             written += 1
 
-        if blank:
-            print()
-            print(f"POMINIETO {len(blank)} pustych kafelkow -- zle numery "
-                  f"w tools/terrain_map.json:")
-            for index, dest in blank:
-                print(f"  kafelek {index} -> {dest}")
-            print("Zapisanie ich zrobiloby te bloki NIEWIDZIALNYMI w grze.")
-            print("Zobacz wlasciwe numery: python3 tools/index_terrain.py <jar>")
-            print()
+
+
+        # Drugi atlas: itemy. Ten sam mechanizm, inna mapa.
+        if "gui/items.png" in names:
+            items_map = json.loads((ROOT / "tools" / "items_map.json").read_text())
+            items_map = {int(k): v for k, v in items_map.items() if k.isdigit()}
+
+            with jar.open("gui/items.png") as fh:
+                items = Image.open(fh).convert("RGBA")
+
+            for index, dest in sorted(items_map.items()):
+                piece = slice_atlas(items, index, args.tile)
+                if is_blank(piece):
+                    blank.append((f"items:{index}", dest))
+                    continue
+                target = OUT / f"{dest}.png"
+                target.parent.mkdir(parents=True, exist_ok=True)
+                piece.save(target)
+                written += 1
+        else:
+            print("  pomijam (brak w jarze): gui/items.png")
 
         for src, dest in DIRECT.items():
             if src not in names:
@@ -130,8 +141,18 @@ def main():
                 Image.open(fh).convert("RGBA").save(target)
             written += 1
 
+    if blank:
+        print()
+        print(f"POMINIETO {len(blank)} pustych kafelkow -- zle numery w mapach:")
+        for index, dest in blank:
+            print(f"  kafelek {index} -> {dest}")
+        print("Zapisanie ich zrobiloby te rzeczy NIEWIDZIALNYMI w grze.")
+        print("Zobacz wlasciwe numery:")
+        print("  python3 tools/index_atlas.py <jar>")
+        print("  python3 tools/index_atlas.py <jar> --atlas gui/items.png")
+        print()
+
     print(f"Zapisano {written} tekstur do {OUT}")
-    print("Atlas itemow (items.png) trzeba jeszcze pociac -- patrz docs/RESOURCEPACK.md")
 
 
 if __name__ == "__main__":
