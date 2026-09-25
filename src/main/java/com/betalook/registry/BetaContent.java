@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -18,13 +18,13 @@ import net.minecraft.world.level.block.Block;
  * Wszystko spoza tych zbiorow jest traktowane jako "post-beta" i nie jest
  * renderowane. Logika, kolizje i AI zostaja nietkniete.
  *
- * Trzymamy ResourceLocation, a nie referencje do pol Blocks/Items -- dzieki temu
+ * Trzymamy Identifier, a nie referencje do pol Blocks/Items -- dzieki temu
  * mod sie nie wywala, gdy Mojang przeniesie albo usunie pole miedzy wersjami.
  */
 public final class BetaContent {
     private BetaContent() {}
 
-    public static final Set<ResourceLocation> BLOCKS = ids(
+    public static final Set<Identifier> BLOCKS = ids(
             "air", "stone", "grass_block", "dirt", "cobblestone", "oak_planks",
             "oak_sapling", "bedrock", "water", "lava",
             "sand", "gravel", "gold_ore", "iron_ore", "coal_ore",
@@ -46,7 +46,7 @@ public final class BetaContent {
             "jack_o_lantern", "carved_pumpkin", "cake", "repeater", "oak_trapdoor"
     );
 
-    public static final Set<ResourceLocation> ENTITIES = ids(
+    public static final Set<Identifier> ENTITIES = ids(
             "player", "item", "experience_orb", "painting", "arrow", "snowball",
             "egg", "fireball", "small_fireball", "tnt", "falling_block",
             "boat", "oak_boat", "minecart", "chest_minecart", "furnace_minecart",
@@ -56,7 +56,7 @@ public final class BetaContent {
             "slime", "ghast", "zombified_piglin", "enderman", "giant"
     );
 
-    public static final Set<ResourceLocation> ITEMS = ids(
+    public static final Set<Identifier> ITEMS = ids(
             "iron_shovel", "iron_pickaxe", "iron_axe", "flint_and_steel", "apple",
             "bow", "arrow", "coal", "charcoal", "diamond", "iron_ingot", "gold_ingot",
             "iron_sword", "wooden_sword", "wooden_shovel", "wooden_pickaxe",
@@ -90,11 +90,11 @@ public final class BetaContent {
             "acacia", "dark_oak", "jungle", "pale_oak"
     };
 
-    public static ResourceLocation unifyWood(ResourceLocation id) {
+    public static Identifier unifyWood(Identifier id) {
         String path = id.getPath();
         for (String species : POST_BETA_WOOD) {
             if (path.startsWith(species + "_")) {
-                return ResourceLocation.fromNamespaceAndPath(
+                return Identifier.fromNamespaceAndPath(
                         id.getNamespace(), "oak" + path.substring(species.length()));
             }
         }
@@ -114,7 +114,7 @@ public final class BetaContent {
 
     public static boolean isBeta(Item item) {
         return ITEM_CACHE.computeIfAbsent(item, i -> {
-            ResourceLocation id = BuiltInRegistries.ITEM.getKey(i);
+            Identifier id = BuiltInRegistries.ITEM.getKey(i);
             return isBetaId(id, ITEMS) || isBetaId(id, BLOCKS);
         });
     }
@@ -124,7 +124,7 @@ public final class BetaContent {
      * Bez tego cherry_planks bylby jednoczesnie mapowany na dab i niewidzialny,
      * co znaczy, ze wisniowy las po prostu by zniknal zamiast wygladac na debowy.
      */
-    private static boolean isBetaId(ResourceLocation id, Set<ResourceLocation> set) {
+    private static boolean isBetaId(Identifier id, Set<Identifier> set) {
         return set.contains(id) || set.contains(unifyWood(id));
     }
 
@@ -140,11 +140,11 @@ public final class BetaContent {
         ENTITY_CACHE.clear();
     }
 
-    private static Set<ResourceLocation> ids(String... paths) {
+    private static Set<Identifier> ids(String... paths) {
         // Arrays.stream, nie Set.of -- Set.of rzuca przy duplikatach,
         // a te listy sa utrzymywane recznie.
         return Arrays.stream(paths)
-                .map(ResourceLocation::withDefaultNamespace)
+                .map(Identifier::withDefaultNamespace)
                 .collect(Collectors.toUnmodifiableSet());
     }
 }

@@ -14,7 +14,6 @@ loom {
 		}
 	}
 
-	accessWidenerPath = file('src/main/resources/betalook.accesswidener')
 }
 
 dependencies {

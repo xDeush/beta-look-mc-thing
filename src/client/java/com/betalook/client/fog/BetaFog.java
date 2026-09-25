@@ -1,9 +1,9 @@
 package com.betalook.client.fog;
 
-import net.minecraft.util.Mth;
-
 /**
  * Mgla tak jak w b1.7.3.
+ *
+ * Bez zaleznosci od klas Minecrafta -- testowalne poza gra.
  *
  * Roznice wzgledem wspolczesnej mgly, ktore tu odtwarzamy:
  *  - na powierzchni mgla jest LINIOWA i zaczyna sie na 25% render distance,
@@ -73,7 +73,7 @@ public final class BetaFog {
 
         float b = skyBrightness * skyBrightness * skyBrightness * skyBrightness;
         float base = (float) relative * (1.0F - b) + b;
-        return Mth.clamp(base, 0.0F, 1.0F);
+        return base < 0.0F ? 0.0F : (base > 1.0F ? 1.0F : base);
     }
 
     /**

@@ -92,8 +92,11 @@ def main() -> None:
 
     for item in hide_items:
         if item_defs:
+            # Celowo "minecraft:model" wskazujacy na pusty model, a nie typ
+            # "minecraft:empty": model jest formatem, ktory na pewno istnieje
+            # w tej wersji, a pusty model i tak daje zero geometrii.
             write(PACK / "items" / f"{item}.json",
-                  {"model": {"type": "minecraft:empty"}})
+                  {"model": {"type": "minecraft:model", "model": EMPTY_MODEL}})
         else:
             write(PACK / "models" / "item" / f"{item}.json", {})
 

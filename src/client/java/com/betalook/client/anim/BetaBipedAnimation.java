@@ -27,10 +27,11 @@ public final class BetaBipedAnimation {
      * @param age          wiek encji w tickach (do bujania rak w bezruchu)
      * @param headYaw      w stopniach
      * @param headPitch    w stopniach
+     * @param riding       poza siedzenia (lodka, wagonik, wierzchowiec)
+     * @param sneaking     poza skradania
      */
     public static void apply(Parts parts, float limbAngle, float limbDistance, float age,
-                             float headYaw, float headPitch, boolean riding, boolean sneaking,
-                             int rightItemPose, int leftItemPose) {
+                             float headYaw, float headPitch, boolean riding, boolean sneaking) {
         parts.head().yRot = headYaw * Mth.DEG_TO_RAD;
         parts.head().xRot = headPitch * Mth.DEG_TO_RAD;
 
@@ -54,15 +55,6 @@ public final class BetaBipedAnimation {
             parts.leftLeg().xRot = -Mth.PI * 2.0F / 5.0F;
             parts.rightLeg().yRot = Mth.PI / 10.0F;
             parts.leftLeg().yRot = -Mth.PI / 10.0F;
-        }
-
-        if (rightItemPose != 0) {
-            parts.rightArm().xRot = parts.rightArm().xRot * 0.5F
-                    - Mth.PI / 10.0F * rightItemPose;
-        }
-        if (leftItemPose != 0) {
-            parts.leftArm().xRot = parts.leftArm().xRot * 0.5F
-                    - Mth.PI / 10.0F * leftItemPose;
         }
 
         parts.rightArm().yRot = 0.0F;

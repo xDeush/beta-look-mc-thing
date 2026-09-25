@@ -4,13 +4,9 @@
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"BiomeColorsMixin",
-		"BlockRenderDispatcherMixin",
 		"EntityRenderDispatcherMixin",
 		"FogRendererMixin",
-		"GameRendererMixin",
-		"HumanoidModelMixin",
-		"ItemRendererMixin",
-		"LightTextureMixin"
+		"HumanoidModelMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

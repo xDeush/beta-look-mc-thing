@@ -15,7 +15,7 @@ SOURCE = ROOT / "src" / "main" / "java" / "com" / "betalook" / "registry" / "Bet
 def _extract(field: str) -> set[str]:
     text = SOURCE.read_text()
     match = re.search(
-        rf"Set<ResourceLocation>\s+{field}\s*=\s*ids\((.*?)\);", text, re.S)
+        rf"Set<\w+>\s+{field}\s*=\s*ids\((.*?)\);", text, re.S)
     if not match:
         raise SystemExit(f"Nie znalazlem pola {field} w {SOURCE}")
     body = match.group(1)

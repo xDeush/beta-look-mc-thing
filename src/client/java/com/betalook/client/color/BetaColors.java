@@ -3,30 +3,32 @@ package com.betalook.client.color;
 /**
  * Kolory biomow z bety.
  *
- * Najbardziej rzucajaca sie w oczy roznica: w b1.7.3 WODA byla wszedzie
- * tego samego koloru -- nie istnialo barwienie wody per biom. Tak samo
- * liscie i trawa braly kolor wylacznie z pary (temperatura, wilgotnosc),
- * bez per-biomowych nadpisan, ktore Mojang dodal pozniej (bagna, ciemny las,
- * wisnie itd.).
+ * W b1.7.3 kolor trawy i lisci szedl wylacznie z pary (temperatura, wilgotnosc)
+ * przez grasscolor.png, bez per-biomowych nadpisan, ktore Mojang dodal pozniej
+ * (bagna, ciemny las, wisnie). Woda nie byla barwiona w ogole.
+ *
+ * Stale ponizej to wartosci srodka mapy kolorow bety -- kolor, ktory gracz
+ * widzial w zwyklym lesie czy na rowninach.
  */
 public final class BetaColors {
     private BetaColors() {}
 
-    /** Jednolity kolor wody z bety. */
+    /** Jednolity kolor wody. W becie nie istnialo barwienie wody per biom. */
     public static final int WATER = 0xFFFFFF;
 
-    /** Kolor mgly podwodnej z bety. */
+    /** Trawa: zielen z rownin bety. */
+    public static final int GRASS = 0x79C05A;
+
+    /** Liscie: odrobine ciemniejsze od trawy, tak jak w becie. */
+    public static final int FOLIAGE = 0x6C9E4B;
+
+    /** Kolor mgly podwodnej. */
     public static final int UNDERWATER_FOG = 0x0C1A3C;
 
-    /** Kolor lisci sosny -- w becie stala, niezalezna od biomu. */
-    public static final int SPRUCE_FOLIAGE = 0x619961;
-
-    /** Kolor lisci brzozy -- j.w. */
-    public static final int BIRCH_FOLIAGE = 0x80A755;
-
     /**
-     * Zwraca indeks do grasscolor.png/foliagecolor.png tak, jak liczyla to beta.
-     * Wilgotnosc byla mnozona przez temperature PRZED zamiana na wspolrzedne.
+     * Indeks do grasscolor.png/foliagecolor.png liczony tak jak w becie:
+     * wilgotnosc byla mnozona przez temperature PRZED zamiana na wspolrzedne.
+     * Zostawione dla narzedzi resourcepacka.
      */
     public static int colorIndex(double temperature, double rainfall) {
         double t = clamp01(temperature);

@@ -1,48 +1,43 @@
 package com.betalook.client.anim;
 
+import org.joml.Quaternionf;
+
 import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.util.Mth;
-import com.mojang.math.Axis;
 
 /**
- * Bujanie kamery i zamach reka wg bety.
+ * Bujanie kamery wg bety.
  *
- * Roznica wzgledem wspolczesnego klienta jest niewielka liczbowo, ale
- * odczuwalna: beta ma wieksza amplitude boczna i inne przesuniecie fazy
- * przy pochyleniu (0.2 rad), przez co chod "kolysze" mocniej.
+ * Liczbowo roznica wzgledem wspolczesnego klienta jest niewielka, ale
+ * odczuwalna: beta ma wieksza amplitude boczna i przesuniecie fazy o 0.2 rad
+ * przy pochyleniu, przez co chod kolysze mocniej i "ciezej".
+ *
+ * Obroty skladamy przez JOML zamiast przez klase Axis -- JOML jest w silniku
+ * na pewno (Vector4f w FogRenderer), a Axis bywa przenoszony miedzy wersjami.
  */
 public final class BetaViewBob {
     private BetaViewBob() {}
 
-    public static void bobView(PoseStack matrices, float walkDistance, float bobAmount,
+    public static void bobView(PoseStack poseStack, float walkDistance, float bobAmount,
                                float bobPitch) {
         float phase = -walkDistance * Mth.PI;
 
-        matrices.translate(
+        poseStack.translate(
                 Mth.sin(phase) * bobAmount * 0.5F,
                 -Math.abs(Mth.cos(phase) * bobAmount),
                 0.0F);
-        matrices.mulPose(Axis.POSITIVE_Z.rotationDegrees(
-                Mth.sin(phase) * bobAmount * 3.0F));
-        matrices.mulPose(Axis.POSITIVE_X.rotationDegrees(
-                Math.abs(Mth.cos(phase - 0.2F) * bobAmount) * 5.0F));
-        matrices.mulPose(Axis.POSITIVE_X.rotationDegrees(bobPitch));
+
+        rotateZ(poseStack, Mth.sin(phase) * bobAmount * 3.0F);
+        rotateX(poseStack, Math.abs(Mth.cos(phase - 0.2F) * bobAmount) * 5.0F);
+        rotateX(poseStack, bobPitch);
     }
 
-    /** Ruch trzymanego przedmiotu przy uderzeniu -- obwiednia sqrt z bety. */
-    public static void swingItem(PoseStack matrices, float swingProgress) {
-        float root = Mth.sqrt(swingProgress);
-        float lift = Mth.sin(root * Mth.PI);
+    private static void rotateX(PoseStack poseStack, float degrees) {
+        poseStack.mulPose(new Quaternionf().rotateX(degrees * Mth.DEG_TO_RAD));
+    }
 
-        matrices.translate(
-                -Mth.sin(root * Mth.PI * 2.0F) * 0.4F,
-                Mth.sin(root * Mth.PI * 2.0F) * 0.2F,
-                -lift * 0.2F);
-        matrices.mulPose(Axis.POSITIVE_Y.rotationDegrees(
-                Mth.sin(root * Mth.PI) * -20.0F));
-        matrices.mulPose(Axis.POSITIVE_Z.rotationDegrees(
-                Mth.sin(root * Mth.PI) * -20.0F));
-        matrices.mulPose(Axis.POSITIVE_X.rotationDegrees(
-                Mth.sin(root * Mth.PI) * -80.0F));
+    private static void rotateZ(PoseStack poseStack, float degrees) {
+        poseStack.mulPose(new Quaternionf().rotateZ(degrees * Mth.DEG_TO_RAD));
     }
 }

@@ -12,14 +12,13 @@ import com.betalook.config.BetaConfig;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.world.entity.Pose;
 
 /**
- * Pelne nadpisanie pozy humanoida po tym, jak vanilla skonczy liczyc swoja.
+ * Nadpisuje poze humanoida po tym, jak vanilla policzy swoja.
  *
- * Kasuje wszystkie pozy dodane po becie -- elytre, plywanie, czolganie,
- * tarcze, riptide i osobne krzywe dla lewej/prawej reki. Beta miala jedna
- * krzywa cosinusowa na konczyne i nic wiecej.
+ * Kasuje wszystko, co doszlo po becie: elytre, plywanie, czolganie, tarcze,
+ * riptide i osobne krzywe dla lewej/prawej reki. Beta miala jedna krzywa
+ * cosinusowa na konczyne i nic poza tym -- stad jej sztywny, "drewniany" chod.
  */
 @Mixin(HumanoidModel.class)
 public abstract class HumanoidModelMixin {
@@ -44,9 +43,7 @@ public abstract class HumanoidModelMixin {
         BetaBipedAnimation.apply(parts,
                 state.walkAnimationPos, state.walkAnimationSpeed, state.ageInTicks,
                 state.yRot, state.xRot,
-                state.pose == Pose.SITTING,
-                state.isCrouching,
-                0, 0);
+                state.isPassenger, state.isCrouching);
         BetaBipedAnimation.applySwing(parts, state.attackTime);
     }
 }

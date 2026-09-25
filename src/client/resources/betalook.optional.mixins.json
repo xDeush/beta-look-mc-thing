@@ -1,0 +1,16 @@
+{
+	"_comment": [
+		"Mixiny, ktorych sygnatur nie moglem zweryfikowac wzgledem zrodel 26.2.",
+		"required=false i defaultRequire=0 sprawiaja, ze nietrafiony injection",
+		"tylko wylacza dana funkcje zamiast wywalac gre przy starcie."
+	],
+	"required": false,
+	"package": "com.betalook.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"GameRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 0
+	}
+}

@@ -1,9 +1,10 @@
 package com.betalook.client.light;
 
-import net.minecraft.util.Mth;
-
 /**
- * Tekstura swiatla (lightmap) 16x16 licona wzorem z bety.
+ * Tekstura swiatla (lightmap) 16x16 liczona wzorem z bety.
+ *
+ * Klasa celowo NIE zalezy od zadnej klasy Minecrafta -- dzieki temu da sie ja
+ * skompilowac i przetestowac bez gry (patrz tools/test_beta_math.java).
  *
  * Trzy rzeczy odrozniaja beta lightmape od wspolczesnej:
  *  1. swiatlo bloku jest wyraznie cieplejsze -- kanal G i B sa tlumione
@@ -28,7 +29,7 @@ public final class BetaLightmap {
     }
 
     public static float brightness(int level) {
-        return BRIGHTNESS_TABLE[Mth.clamp(level, 0, 15)];
+        return BRIGHTNESS_TABLE[clampLevel(level)];
     }
 
     /**
@@ -69,9 +70,9 @@ public final class BetaLightmap {
         g += block * ((block * 0.6F + 0.4F) * 0.9F + 0.1F);
         b += block * (block * block * 0.6F + 0.4F);
 
-        r = Mth.clamp(r, 0.0F, 1.0F);
-        g = Mth.clamp(g, 0.0F, 1.0F);
-        b = Mth.clamp(b, 0.0F, 1.0F);
+        r = clamp01(r);
+        g = clamp01(g);
+        b = clamp01(b);
 
         // Gamma: w becie po prostu podnosila podloge jasnosci.
         if (gamma > 0.0F) {
@@ -89,6 +90,14 @@ public final class BetaLightmap {
                 | ((int) (r * 255.0F) << 16)
                 | ((int) (g * 255.0F) << 8)
                 | (int) (b * 255.0F);
+    }
+
+    private static int clampLevel(int level) {
+        return level < 0 ? 0 : (level > 15 ? 15 : level);
+    }
+
+    private static float clamp01(float v) {
+        return v < 0.0F ? 0.0F : (v > 1.0F ? 1.0F : v);
     }
 
     private static float lift(float value, float gamma) {

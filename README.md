@@ -1,86 +1,81 @@
 # BetaLook
 
-Sprawia, ze wspolczesny Minecraft wyglada jak **Beta 1.7.3**.
+Sprawia, ze wspolczesny Minecraft (26.2, Fabric) wyglada jak **Beta 1.7.3**.
 
-Projekt sklada sie z trzech warstw, bo samym resourcepackiem tego nie da sie zrobic:
+## Podzial pracy
 
-| Warstwa | Co robi | Czemu nie da sie inaczej |
+Nie da sie tego zrobic jedna warstwa. Podzial nie jest arbitralny -- kazda
+rzecz siedzi tam, gdzie da sie ja zrobic *dobrze*:
+
+| Warstwa | Co robi | Czemu tam |
 |---|---|---|
-| **Mod (Fabric)** | mgla, silnik swiatla, animacje, ukrywanie tresci po-betowych | resourcepack nie ma dostepu do lightmapy ani do krzywych animacji |
-| **Resourcepack** | tekstury z bety, ujednolicenie drewna | tekstury to czysty resourcepack |
-| **(opcjonalnie) shadery** | tylko jesli grasz z Iris/Sodium | w vanilli silnik swiatla nadpisuje mod, shader jest niepotrzebny |
+| **Mod** | mgla, animacje, kolory biomow, ukrywanie mobow | resourcepack nie ma dostepu do krzywych animacji ani do mgly |
+| **Resourcepack** | tekstury, ukrywanie blokow i itemow, ujednolicenie drewna | dziala tez z Sodium, ktory omija mixiny renderu |
+| **Shadery** | niepotrzebne | mod nadpisuje mgle i swiatlo bezposrednio |
 
-## Stan projektu
+## Co dziala
 
-Kod jest napisany pod **Mojang mappings** i Fabric Loom 1.17 (Yarn nie istnieje
-od 26.1 -- loom juz nie remapuje). Wersje w `gradle.properties` sa sprawdzone
-na fabricmc.net.
+**Mod** (4 zweryfikowane mixiny):
+- `FogRendererMixin` -- mgla liniowa od 25% dystansu + void fog ponizej y=20
+- `EntityRenderDispatcherMixin` -- moby spoza bety znikaja (ale zyja i atakuja)
+- `BiomeColorsMixin` -- jednolita woda, trawa i liscie z bety
+- `HumanoidModelMixin` -- poza gracza i mobow 1:1 z `ModelBiped` z bety
+- `GameRendererMixin` -- bujanie kamery (opcjonalny, patrz nizej)
 
-**Nie zostal jednak skompilowany** -- pisalem go w kontenerze bez dostepu do
-`maven.fabricmc.net`, wiec loom nie mial skad sciagnac Minecrafta. Sygnatury
-mixinow moga wymagac drobnych poprawek; lista miejsc do sprawdzenia jest
-w `docs/TODO.md`. Bledny mixin wywala sie glosno przy starcie, wiec znajdziesz
-go od razu.
+**Resourcepack** (3 skrypty):
+- `gen_hide_pack.py` -- ukrywa wszystko, czego nie bylo w becie
+- `gen_wood_overrides.py` -- cherry/mangrove/bamboo/... renderuja sie jak dab
+- `extract_beta_textures.py` -- tnie `terrain.png` z twojego jara bety
 
-## Co juz jest
+**Przetestowane** (`tools/run_tests.sh`, 25 asercji, bez Minecrafta i sieci):
+krzywa jasnosci, cieplota swiatla pochodni, podloga ambientu, start mgly,
+void fog, indeks mapy kolorow.
 
-- `registry/BetaContent` -- pelne listy blokow, itemow i encji z b1.7.3 + mapa ujednolicania drewna
-- `client/fog/BetaFog` -- mgla liniowa od 25% render distance, void fog ponizej y=20
-- `client/light/BetaLightmap` -- oryginalny wzor na teksture swiatla (cieple swiatlo pochodni)
-- `client/anim/BetaBipedAnimation` -- poza humanoida 1:1 z `ModelBiped` z bety
-- `client/anim/BetaViewBob` -- bujanie kamery i zamach reka wg bety
-- `client/render/PostBetaVisibility` -- jedno miejsce decydujace, co sie nie rysuje
-- 6 mixinow spinajacych to z klientem
-- `config/BetaConfig` -- kazdy modul osobno wylaczalny (`config/betalook.properties`)
-- `tools/` -- skrypty do resourcepacka
-
-## Resourcepack: ukrywanie wszystkiego, co nowe
+## Szybki start
 
 ```bash
-python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar --dry-run  # podglad
-python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar           # generuj
-```
+# 1. Resourcepack: ukryj wszystko nowe + ujednolic drewno
+python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar
+python3 tools/gen_wood_overrides.py
 
-Skrypt czyta liste blokow i itemow z twojego jara, odejmuje liste bety
-(prosto z `BetaContent.java` -- jedno zrodlo prawdy) i dla reszty wypluwa
-puste modele.
-
-Drewno post-betowe jest **wyjete z ukrywania** -- cherry, mangrove, bamboo
-itd. sa mapowane na dab, nie kasowane. Inaczej wisniowy las by zniknal
-zamiast wygladac na debowy.
-
-Ten pack jest tez jedynym sposobem na ukrywanie blokow **przy Sodium**,
-ktory omija mixiny renderu chunkow.
-
-## Tekstury
-
-**Repo nie zawiera tekstur Mojanga i nie bedzie.** Wypakuj je z wlasnej kopii jara bety:
-
-```bash
+# 2. Tekstury z twojej kopii bety
 pip install pillow
 python3 tools/extract_beta_textures.py ~/.minecraft/versions/b1.7.3/b1.7.3.jar
-python3 tools/gen_wood_overrides.py
+
+# 3. Mod
+./gradlew build      # -> build/libs/betalook-0.2.0.jar
 ```
 
-Szczegoly: [`docs/RESOURCEPACK.md`](docs/RESOURCEPACK.md).
+Testy matematyki, bez niczego: `./tools/run_tests.sh`
 
-## Build
+## Zanim odpalisz: czego nie moglem sprawdzic
 
-```bash
-./gradlew build      # -> build/libs/betalook-0.1.0.jar
-./gradlew runClient  # test
-```
+Pisalem to w kontenerze bez dostepu do `maven.fabricmc.net`, wiec
+**projekt nie zostal skompilowany**. Nazwy klas ustalilem czytajac zrodla
+Sodium, Iris i Fabric API, ktore celuja w te wersje -- pelen rozpis co
+zweryfikowane, a co nie, jest w [`docs/SIGNATURES.md`](docs/SIGNATURES.md).
+
+Mixiny o niepewnych sygnaturach siedza w osobnym configu z `required: false`,
+wiec w najgorszym razie **wylaczy sie jedna funkcja, a nie cala gra**.
+
+Brakuje jeszcze lightmapy (cieple swiatlo pochodni). Matematyka jest gotowa
+i przetestowana, brakuje 10 linijek mixina -- instrukcja krok po kroku
+w [`docs/LIGHTMAP.md`](docs/LIGHTMAP.md).
 
 ## Ukrywanie tresci po-betowej
 
-Domyslnie bloki, moby i itemy spoza bety **nie sa renderowane**, ale nadal istnieja:
-kolizje, redstone, AI i logika serwera dzialaja normalnie. Niewidzialny blok wciaz
-blokuje ruch -- to swiadoma decyzja, zeby swiat nie stal sie niegrywalny.
+Domyslnie bloki, moby i itemy spoza bety **nie sa renderowane**, ale nadal
+istnieja: kolizje, redstone, AI i logika serwera dzialaja normalnie.
+Niewidzialny blok wciaz blokuje ruch -- inaczej wpadalbys w dziury.
 
-Zmiana w `config/betalook.properties`:
+Drewno post-betowe jest **wyjete z ukrywania** i mapowane na dab. Inaczej
+wisniowy las by zniknal zamiast wygladac na debowy.
 
-```properties
-hide_post_beta_blocks=true
-hide_post_beta_entities=true
-hide_post_beta_items=true
-```
+Kazdy modul wylacza sie osobno w `config/betalook.properties`.
+
+## Dokumentacja
+
+- [`docs/SIGNATURES.md`](docs/SIGNATURES.md) -- co zweryfikowane i skad
+- [`docs/LIGHTMAP.md`](docs/LIGHTMAP.md) -- jak dokonczyc swiatlo
+- [`docs/RESOURCEPACK.md`](docs/RESOURCEPACK.md) -- tekstury i atlasy
+- [`docs/TODO.md`](docs/TODO.md) -- co zostalo
