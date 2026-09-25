@@ -33,20 +33,44 @@ void fog, indeks mapy kolorow.
 
 ## Szybki start
 
+Potrzebujesz **JDK 25** (`java -version` musi pokazac 25) i Gita.
+
+### Windows (cmd)
+
+```bat
+git clone -b claude/hopeful-hopper-4ypcxj https://github.com/xDeush/beta-look-mc-thing
+cd beta-look-mc-thing
+
+:: 1. Resourcepack: ukryj wszystko nowe + ujednolic drewno
+python tools\gen_hide_pack.py "%APPDATA%\.minecraft\versions\26.2\26.2.jar"
+python tools\gen_wood_overrides.py
+
+:: 2. Tekstury z twojej kopii bety
+pip install pillow
+python tools\extract_beta_textures.py "%APPDATA%\.minecraft\versions\b1.7.3\b1.7.3.jar"
+
+:: 3. Mod -- BEZ "./" na poczatku, to skladnia linuksowa
+gradlew.bat build
+```
+
+Gotowy mod: `build\libs\betalook-0.2.0.jar` -> wrzuc do `%APPDATA%\.minecraft\mods`
+Resourcepack: spakuj zawartosc `resourcepack\` do zipa -> `%APPDATA%\.minecraft\resourcepacks`
+
+### Linux / macOS
+
 ```bash
-# 1. Resourcepack: ukryj wszystko nowe + ujednolic drewno
+git clone -b claude/hopeful-hopper-4ypcxj https://github.com/xDeush/beta-look-mc-thing
+cd beta-look-mc-thing
+
 python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar
 python3 tools/gen_wood_overrides.py
-
-# 2. Tekstury z twojej kopii bety
 pip install pillow
 python3 tools/extract_beta_textures.py ~/.minecraft/versions/b1.7.3/b1.7.3.jar
 
-# 3. Mod
-./gradlew build      # -> build/libs/betalook-0.2.0.jar
+./gradlew build
 ```
 
-Testy matematyki, bez niczego: `./tools/run_tests.sh`
+Testy matematyki, bez Minecrafta i sieci: `./tools/run_tests.sh`
 
 ## Zanim odpalisz: czego nie moglem sprawdzic
 
