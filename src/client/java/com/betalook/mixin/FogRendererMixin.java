@@ -48,7 +48,8 @@ public class FogRendererMixin {
         float end = shape.end();
 
         if (BetaConfig.voidFog) {
-            double eyeY = camera.getPosition().y;
+            // camera.position(), nie getPosition() -- akcesory Camera stracily prefiks "get".
+            double eyeY = camera.position().y;
             end = BetaFog.voidFogEnd(end, eyeY);
             start = Math.min(start, end * BetaFog.LINEAR_START_FACTOR);
         }

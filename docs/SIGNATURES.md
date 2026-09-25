@@ -31,6 +31,7 @@ wycina geometrie juz przy bakowaniu.
 | rejestry | `BuiltInRegistries.BLOCK/ITEM/ENTITY_TYPE.getKey(...)` -> `Identifier` | Iris, Fabric API |
 | `Identifier` | `fromNamespaceAndPath`, `withDefaultNamespace`, `parse` | 500+ uzyc w Fabric API |
 | model | `HumanoidModel`, `ModelPart`, `Model.setupAnim(S)` | Fabric API `TransformCopyingModel` |
+| kamera | `Camera.position()`, `Camera.entity()`, `Camera.getFluidInCamera()` | Iris, Sodium -- akcesory `Camera` stracily prefiks `get`, poza `getFluidInCamera` |
 | lightmapa | klasa `LightmapRenderStateExtractor`, metoda `extract(LightmapRenderState, float)` | Iris `MixinLightTexture` |
 
 ## NIEzweryfikowane -- sprawdz przy pierwszym buildzie
@@ -47,6 +48,21 @@ injection **wylacza tylko dana funkcje zamiast wywalac gre**.
 
 Najszybsza weryfikacja u siebie: `./gradlew genSources`, potem czytanie
 zdekompilowanej klasy.
+
+## Ustalone przy pierwszej prawdziwej kompilacji
+
+Te rzeczy wyszly dopiero, gdy kod trafil na javac z prawdziwym Minecraftem --
+zadnego z tych nie dalo sie wyczytac ze zrodel Sodium czy Iris:
+
+- `Camera.getPosition()` -> **`Camera.position()`**
+- `PreparableReloadListener.reload` ma teraz
+  `(SharedState, Executor, PreparationBarrier, Executor)`, a Fabric przenosi
+  resource-loader z v0 na v1
+- pol `walkDist`, `walkDistO`, `bob`, `oBob` **nie ma** w `LocalPlayer`
+
+Wniosek na przyszlosc: czytanie cudzych modow daje dobry obraz architektury
+i nazw klas, ale nie zastepuje kompilacji. Nazwy metod i pol, ktorych te mody
+akurat nie uzywaja, pozostaja niewiadoma az do pierwszego builda.
 
 ## Czego nie zrobilem i dlaczego
 
