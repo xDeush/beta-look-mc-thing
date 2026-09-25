@@ -33,7 +33,15 @@ void fog, indeks mapy kolorow.
 
 ## Szybki start
 
-Potrzebujesz **JDK 25** (`java -version` musi pokazac 25) i Gita.
+Potrzebujesz **JDK 25** i Gita.
+
+Minecraft 26.x sam chodzi na Javie 25, wiec i tak jej potrzebujesz -- to nie jest
+wymog tego moda. Sprawdz, co masz: `java -version`. Jesli mniej niz 25, pobierz
+**Eclipse Temurin JDK 25** z https://adoptium.net (przy instalacji zaznacz
+"Set JAVA_HOME variable") i otworz NOWE okno cmd.
+
+Build uzywa toolchaina, wiec jesli JDK 25 jest gdziekolwiek w systemie, Gradle
+go znajdzie sam -- nawet gdy JAVA_HOME wskazuje starsza wersje.
 
 ### Windows (cmd)
 

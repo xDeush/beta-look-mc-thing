@@ -36,12 +36,16 @@ processResources {
 	}
 }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
-}
-
 java {
 	withSourcesJar()
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+
+	// Toolchain, a nie sourceCompatibility: dzieki temu Gradle SZUKA
+	// zainstalowanego JDK 25, zamiast probowac kompilowac tym, na ktorym
+	// sam zostal uruchomiony. Jesli JAVA_HOME wskazuje starsza Jave, a JDK 25
+	// jest gdziekolwiek w systemie, build i tak przejdzie -- i dostajesz
+	// konkretny komunikat "no matching toolchain" zamiast mglistego
+	// "release version 25 not supported".
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
 }
