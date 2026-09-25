@@ -1,4 +1,4 @@
-package com.betalook.mixin.client;
+package com.betalook.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -7,19 +7,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.betalook.client.render.PostBetaVisibility;
 
-import net.minecraft.client.render.entity.EntityRenderDispatcher;
-import net.minecraft.entity.Entity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.world.entity.Entity;
 
-/** Moby i encje spoza bety po prostu sie nie rysuja. Nadal zyja i atakuja. */
+/** Moby i encje spoza bety sie nie rysuja. Nadal zyja, chodza i atakuja. */
 @Mixin(EntityRenderDispatcher.class)
 public abstract class EntityRenderDispatcherMixin {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private <E extends Entity> void betalook$hidePostBeta(E entity, double x, double y, double z,
-                                                          float tickDelta,
-                                                          net.minecraft.client.util.math.MatrixStack matrices,
-                                                          net.minecraft.client.render.VertexConsumerProvider vertices,
-                                                          int light, CallbackInfo ci) {
+                                                          float partialTick, PoseStack poseStack,
+                                                          MultiBufferSource buffers, int light,
+                                                          CallbackInfo ci) {
         if (!PostBetaVisibility.shouldRender(entity)) {
             ci.cancel();
         }

@@ -1,46 +1,53 @@
 # Co zostalo do zrobienia
 
-## Krytyczne -- bez tego sie nie zbuduje
+## Zalatwione w tej turze
 
-1. **Wersje w `gradle.properties`** sa placeholderami. Wpisz faktyczne
-   `minecraft_version`, `yarn_mappings`, `loader_version`, `fabric_version`
-   z https://fabricmc.net/develop/ dla wersji docelowej.
+- Migracja na **Mojang mappings** -- Yarn nie istnieje od 26.1, loom juz nie remapuje
+- `splitEnvironmentSourceSets()` -- kod klienta w `src/client`, inaczej dedyk sie wywala
+- Java 25, `net.fabricmc.fabric-loom` (nowy plugin, bez `mappings`)
+- Kolory biomow (jednolita woda z bety) i ukrywanie itemow w swiecie
+- Resourcepack ukrywajacy wszystko post-betowe (`tools/gen_hide_pack.py`)
 
-2. **Nazwy klas i metod w mixinach** pisalem wg ukladu klienta, jaki znam.
-   Do zweryfikowania wzgledem faktycznych mappingow 26.2:
-   - `BackgroundRenderer#applyFog` -- sygnatura i klasa `Fog` zmieniaja sie czesto
-   - `LightmapTextureManager#update` oraz pola `image`/`texture`/`dirty`
-   - `BipedEntityModel#setAngles` -- od 1.21.2 przyjmuje `BipedEntityRenderState`,
-     a nazwy pol stanu (`limbFrequency`, `relativeHeadYaw`, ...) sa ruchome
-   - `GameRenderer#bobView` oraz pola `horizontalSpeed`/`strideDistance` gracza
-   - `BlockRenderManager#renderBlock` -- sygnatura
-   - `EntityRenderDispatcher#render` -- sygnatura
+## Krytyczne -- do sprawdzenia przy pierwszym buildzie
 
-   Najszybsza droga: `./gradlew genSources` i czytanie zdekompilowanego kodu.
+Nie moglem tego zweryfikowac: kontener nie ma dostepu do `maven.fabricmc.net`
+ani `libraries.minecraft.net`, wiec loom nie sciagnie Minecrafta i **nic sie
+tu nie skompilowalo**. Kod jest pisany pod API, ktore znam, ale sygnatury
+renderu Mojang rusza czesto. Przy pierwszym `./gradlew build` sprawdz:
 
-## Wazne -- brakujace moduly
+| Mixin | Co moze sie nie zgadzac |
+|---|---|
+| `FogRendererMixin` | `FogRenderer.setupFog` i rekord `FogParameters` -- zmieniane w 1.21.x kilka razy |
+| `LightTextureMixin` | pola `lightPixels` / `lightTexture` / `updateLightTexture` |
+| `HumanoidModelMixin` | nazwy pol w `HumanoidRenderState` (`walkAnimationPos`, `yRot`, `attackTime`) |
+| `GameRendererMixin` | pola gracza `walkDist` / `walkDistO` / `bob` / `oBob` |
+| `BlockRenderDispatcherMixin` | sygnatura `renderBatched` |
+| `ItemRendererMixin` | sygnatura `renderStatic` |
 
-3. **Niebo i chmury** (`beta_sky`, `beta_clouds` w configu sa, mixina nie ma).
-   Beta: chmury nizej (y=108), wolniejsze, bez cieniowania; gradient nieba
-   liczony z temperatury biomu; brak koloru wschodu/zachodu w formie z 1.8+.
+Jak cos nie pasuje: `./gradlew genSources`, otworz zdekompilowana klase,
+popraw sygnature. Mixin z bledem wywali sie **glosno** przy starcie
+(`defaultRequire: 1`), wiec sie nie przeoczy.
 
-4. **Kolory biomow** -- `BetaColors` istnieje, ale nic go jeszcze nie wola.
-   Potrzebny mixin na `BiomeColors` (jednolity kolor wody!) i na tinty trawy/lisci.
+## Wazne -- czego nadal nie ma
 
-5. **Smooth lighting** -- `beta_smooth_lighting` w configu, brak implementacji.
-   Beta liczyla AO inaczej (bez interpolacji po rogach w formie z 1.8).
+1. **Niebo i chmury** (`beta_sky`, `beta_clouds` sa w configu, mixina nie ma).
+   Beta: chmury na y=108, wolniejsze, bez cieniowania; gradient nieba z temperatury
+   biomu. Nie pisalem tego na slepo, bo `CloudRenderer` przeszedl w 1.21.x
+   przepisanie i zgadywanie sygnatur nie ma sensu bez zrodel.
 
-6. **Ukrywanie itemow w GUI** -- `PostBetaVisibility.shouldRender(ItemStack)`
-   nie jest jeszcze nigdzie podpiete.
+2. **Smooth lighting** (`beta_smooth_lighting` w configu, brak implementacji).
+   Beta liczyla AO bez interpolacji po rogach, ktora weszla w 1.8.
 
-7. **Czastki** -- beta miala mniej typow i inne krzywe zaniku.
+3. **Tinty trawy i lisci** -- `BetaColors.colorIndex` istnieje, ale nic go nie wola.
+   Potrzebny mixin na `BlockColors` -- inaczej wisniowe liscie beda rozowe
+   przez tint, mimo ze tekstura jest debowa.
 
-## Do przemyslenia
+4. **Czastki** -- beta miala mniej typow i inne krzywe zaniku.
 
-8. Ujednolicenie drewna dziala na modelach, ale **mapy kolorow** (cherry ma
-   rozowe liscie przez tint, nie przez teksture) moga wymagac osobnego mixina
-   na `BlockColors`.
+5. **Ciecie `gui/items.png`** -- `extract_beta_textures.py` tnie tylko terrain.png.
 
-9. Kompatybilnosc z Sodium/Iris -- Sodium ma wlasny pipeline renderu chunkow,
-   wiec `BlockRenderManagerMixin` go NIE zlapie. Potrzebny osobny modul
-   przez Sodium API.
+## Kompatybilnosc
+
+**Sodium omija `BlockRenderDispatcherMixin`** -- ma wlasny pipeline chunkow.
+Dlatego `tools/gen_hide_pack.py` jest wazny: pack dziala niezaleznie od renderera.
+Z Sodium ukrywanie blokow zalatwia pack, a mod zajmuje sie reszta.

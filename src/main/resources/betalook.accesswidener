@@ -1,6 +1,6 @@
 accessWidener	v2	named
 
 # Lightmapa: podmieniamy jej zawartosc wlasnym wzorem z bety.
-accessible	field	net/minecraft/client/render/LightmapTextureManager	image	Lnet/minecraft/client/texture/NativeImage;
-accessible	field	net/minecraft/client/render/LightmapTextureManager	texture	Lnet/minecraft/client/texture/NativeImageBackedTexture;
-accessible	field	net/minecraft/client/render/LightmapTextureManager	dirty	Z
+accessible	field	net/minecraft/client/renderer/LightTexture	lightPixels	Lcom/mojang/blaze3d/platform/NativeImage;
+accessible	field	net/minecraft/client/renderer/LightTexture	lightTexture	Lnet/minecraft/client/renderer/texture/DynamicTexture;
+accessible	field	net/minecraft/client/renderer/LightTexture	updateLightTexture	Z

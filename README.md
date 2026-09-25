@@ -12,9 +12,15 @@ Projekt sklada sie z trzech warstw, bo samym resourcepackiem tego nie da sie zro
 
 ## Stan projektu
 
-Szkielet jest kompletny i spojny, ale **nie jest jeszcze skompilowany wzgledem 26.2** --
-wersje w `gradle.properties` sa placeholderami, a nazwy klas/metod w mixinach trzeba
-zweryfikowac wzgledem faktycznych mappingow yarn dla tej wersji. Patrz `docs/TODO.md`.
+Kod jest napisany pod **Mojang mappings** i Fabric Loom 1.17 (Yarn nie istnieje
+od 26.1 -- loom juz nie remapuje). Wersje w `gradle.properties` sa sprawdzone
+na fabricmc.net.
+
+**Nie zostal jednak skompilowany** -- pisalem go w kontenerze bez dostepu do
+`maven.fabricmc.net`, wiec loom nie mial skad sciagnac Minecrafta. Sygnatury
+mixinow moga wymagac drobnych poprawek; lista miejsc do sprawdzenia jest
+w `docs/TODO.md`. Bledny mixin wywala sie glosno przy starcie, wiec znajdziesz
+go od razu.
 
 ## Co juz jest
 
@@ -27,6 +33,24 @@ zweryfikowac wzgledem faktycznych mappingow yarn dla tej wersji. Patrz `docs/TOD
 - 6 mixinow spinajacych to z klientem
 - `config/BetaConfig` -- kazdy modul osobno wylaczalny (`config/betalook.properties`)
 - `tools/` -- skrypty do resourcepacka
+
+## Resourcepack: ukrywanie wszystkiego, co nowe
+
+```bash
+python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar --dry-run  # podglad
+python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar           # generuj
+```
+
+Skrypt czyta liste blokow i itemow z twojego jara, odejmuje liste bety
+(prosto z `BetaContent.java` -- jedno zrodlo prawdy) i dla reszty wypluwa
+puste modele.
+
+Drewno post-betowe jest **wyjete z ukrywania** -- cherry, mangrove, bamboo
+itd. sa mapowane na dab, nie kasowane. Inaczej wisniowy las by zniknal
+zamiast wygladac na debowy.
+
+Ten pack jest tez jedynym sposobem na ukrywanie blokow **przy Sodium**,
+ktory omija mixiny renderu chunkow.
 
 ## Tekstury
 

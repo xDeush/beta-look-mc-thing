@@ -1,0 +1,21 @@
+{
+	"required": true,
+	"package": "com.betalook.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"BiomeColorsMixin",
+		"BlockRenderDispatcherMixin",
+		"EntityRenderDispatcherMixin",
+		"FogRendererMixin",
+		"GameRendererMixin",
+		"HumanoidModelMixin",
+		"ItemRendererMixin",
+		"LightTextureMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}

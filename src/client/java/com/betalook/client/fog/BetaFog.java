@@ -1,6 +1,6 @@
 package com.betalook.client.fog;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
  * Mgla tak jak w b1.7.3.
@@ -73,7 +73,7 @@ public final class BetaFog {
 
         float b = skyBrightness * skyBrightness * skyBrightness * skyBrightness;
         float base = (float) relative * (1.0F - b) + b;
-        return MathHelper.clamp(base, 0.0F, 1.0F);
+        return Mth.clamp(base, 0.0F, 1.0F);
     }
 
     /**

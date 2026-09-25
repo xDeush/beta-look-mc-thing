@@ -1,6 +1,6 @@
 package com.betalook.client.light;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
  * Tekstura swiatla (lightmap) 16x16 licona wzorem z bety.
@@ -28,7 +28,7 @@ public final class BetaLightmap {
     }
 
     public static float brightness(int level) {
-        return BRIGHTNESS_TABLE[MathHelper.clamp(level, 0, 15)];
+        return BRIGHTNESS_TABLE[Mth.clamp(level, 0, 15)];
     }
 
     /**
@@ -69,9 +69,9 @@ public final class BetaLightmap {
         g += block * ((block * 0.6F + 0.4F) * 0.9F + 0.1F);
         b += block * (block * block * 0.6F + 0.4F);
 
-        r = MathHelper.clamp(r, 0.0F, 1.0F);
-        g = MathHelper.clamp(g, 0.0F, 1.0F);
-        b = MathHelper.clamp(b, 0.0F, 1.0F);
+        r = Mth.clamp(r, 0.0F, 1.0F);
+        g = Mth.clamp(g, 0.0F, 1.0F);
+        b = Mth.clamp(b, 0.0F, 1.0F);
 
         // Gamma: w becie po prostu podnosila podloge jasnosci.
         if (gamma > 0.0F) {
