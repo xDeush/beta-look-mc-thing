@@ -27,15 +27,6 @@ brakujacy kawalek bez zgadywania.
 
 ## Do dokonczenia
 
-3. **Smooth lighting** -- beta liczyla AO bez interpolacji po rogach,
-   ktora weszla w 1.8. Flaga `beta_smooth_lighting` juz jest w configu.
-
-4. **Czastki** -- beta miala mniej typow i inne krzywe zaniku.
-
-5. **Ciecie `gui/items.png`** -- `extract_beta_textures.py` tnie na razie
-   tylko `terrain.png` (90 kafli zmapowanych). Format mapy taki sam,
-   dopisz `tools/items_map.json`.
-
 6. **Niebo** -- gradient nieba w becie szedl z temperatury biomu.
    `SkyRenderer.renderSunriseAndSunset(PoseStack, float, int)` potwierdzony
    w zrodlach Iris, reszta nie.
@@ -50,6 +41,18 @@ Pelna tabela w [`SIGNATURES.md`](SIGNATURES.md). Najkrocej:
 
 Jesli `HumanoidModelMixin` sie nie kompiluje, popraw te nazwy wg `genSources` --
 reszta moda jest od nich niezalezna.
+
+## Smooth lighting: czego tu NIE ma
+
+Sprawdzilem i nie odtwarzam beta-owego AO, bo nie ma czego odtwarzac:
+algorytm smooth lightingu nie zmienil sie od bety w sposob, ktory dalby
+sie sensownie zrekonstruowac. Napisanie modulu "beta AO" bylby placebo.
+
+`beta_smooth_lighting` rozwiazuje za to konkretny blad, ktory powstaje
+z polaczenia moda z packiem: blok spoza bety jest niewidzialny, ale bez
+tego nadal zaciemnia sasiadow. W jaskini wygladalo to jak cien rzucany
+przez powietrze. `BlockModelLighterMixin` zwraca dla takich blokow
+"przezroczystosc swietlna" 1.0.
 
 ## Decyzje, ktore warto znac
 

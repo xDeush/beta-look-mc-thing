@@ -33,8 +33,18 @@ public final class BetaConfig {
     public static boolean betaViewBobbing = true;
     public static boolean betaHandSwing = true;
 
-    /** Beta nie miala plynnego swiatla per-vertex w formie z 1.8+ -- osobny przelacznik. */
+    /**
+     * Ukryte bloki nie rzucaja cieni smooth lightingu.
+     *
+     * Sam algorytm AO nie zmienil sie od bety w sposob, ktory da sie
+     * sensownie odtworzyc. Ten przelacznik rozwiazuje konkretny blad:
+     * blok spoza bety jest niewidzialny, ale bez tego nadal zaciemnia
+     * sasiadow -- czyli cien rzucany przez powietrze.
+     */
     public static boolean betaSmoothLighting = true;
+
+    /** Czastki, ktorych w becie nie bylo, nie powstaja. */
+    public static boolean betaParticles = true;
 
     /** Void fog ponizej y=0 tak jak w becie. Domyslnie wl. */
     public static boolean voidFog = true;
@@ -71,6 +81,7 @@ public final class BetaConfig {
         betaViewBobbing = bool(p, "beta_view_bobbing", betaViewBobbing);
         betaHandSwing = bool(p, "beta_hand_swing", betaHandSwing);
         betaSmoothLighting = bool(p, "beta_smooth_lighting", betaSmoothLighting);
+        betaParticles = bool(p, "beta_particles", betaParticles);
         voidFog = bool(p, "void_fog", voidFog);
         dumpClasses = bool(p, "dump_classes", dumpClasses);
         BetaContent.invalidateCaches();
@@ -92,6 +103,7 @@ public final class BetaConfig {
         p.setProperty("beta_view_bobbing", String.valueOf(betaViewBobbing));
         p.setProperty("beta_hand_swing", String.valueOf(betaHandSwing));
         p.setProperty("beta_smooth_lighting", String.valueOf(betaSmoothLighting));
+        p.setProperty("beta_particles", String.valueOf(betaParticles));
         p.setProperty("void_fog", String.valueOf(voidFog));
         p.setProperty("dump_classes", String.valueOf(dumpClasses));
         try {

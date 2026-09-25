@@ -8,6 +8,7 @@
 	"package": "com.betalook.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"ClientLevelMixin",
 		"CloudRendererMixin",
 		"GameRendererMixin"
 	],
