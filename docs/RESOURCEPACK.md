@@ -34,6 +34,27 @@ blad przy recznym pakowaniu. `build_pack.py` pakuje zawartosc.
 Sam pack juz ukrywa bloki i itemy oraz ujednolica drewno. Mod dokłada
 mgle, swiatlo, animacje i ukrywanie mobow -- czyli to, czego pack nie potrafi.
 
+## Ukrywanie vs podstawianie
+
+Nie wszystko, czego nie bylo w becie, mozna po prostu ukryc. Bloki tworzace
+teren -- granit, dioryt, andezyt, tuff, deepslate -- wystepuja w ziemi
+masowo. Ukrycie ich robi **dziury w terenie**: patrzysz przez ziemie
+w mgle i swiat wyglada na zniszczony, nie na betowy.
+
+Dlatego sa dwie sciezki:
+
+| | Co sie dzieje | Przyklady |
+|---|---|---|
+| **Podstawienie** | renderuje sie jak betowy odpowiednik | granite -> stone, deepslate_iron_ore -> iron_ore, coarse_dirt -> dirt, tall_grass -> short_grass |
+| **Ukrycie** | nie renderuje sie wcale | sculk, amethyst, bloki z Endu, dekoracje |
+
+Mapa podstawien siedzi w `tools/substitutions.json` i mozesz ja dopisywac.
+Format: `"blok_wspolczesny": "blok_z_bety"`.
+
+Jesli po wlaczeniu packa widzisz dziury w ziemi, to znaczy, ze jakis blok
+tworzacy teren nie ma jeszcze podstawienia. Sprawdz, co to, klawiszem F3
+(patrzac na krawedz dziury) i dopisz go do tego pliku.
+
 ## Skad tekstury
 
 Z **twojej wlasnej** kopii `b1.7.3.jar`. Mojang nie pozwala redystrybuowac swoich

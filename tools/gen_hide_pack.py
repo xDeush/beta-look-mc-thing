@@ -19,6 +19,12 @@ import zipfile
 
 from beta_lists import BETA_BLOCKS, BETA_ITEMS, POST_BETA_WOOD
 
+SUBSTITUTIONS = {
+    k: v for k, v in
+    json.loads((pathlib.Path(__file__).resolve().parent / "substitutions.json").read_text()).items()
+    if not k.startswith("_")
+}
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PACK = ROOT / "resourcepack" / "assets" / "minecraft"
 
@@ -93,15 +99,27 @@ def main() -> None:
     def keep(name: str, beta: set[str]) -> bool:
         return name in beta or unify(name) in beta
 
-    hide_blocks = sorted(b for b in all_blocks if not keep(b, BETA_BLOCKS))
-    hide_items = sorted(i for i in (item_defs or legacy_items) if not keep(i, BETA_ITEMS))
+    # Bloki tworzace teren NIE sa ukrywane, tylko podstawiane betowym
+    # odpowiednikiem. Ukrywanie granitu, deepslate czy andezytu robi
+    # dziury w ziemi -- swiat wyglada na zniszczony, nie na betowy.
+    substitute = {b: SUBSTITUTIONS[b] for b in all_blocks if b in SUBSTITUTIONS}
 
-    print(f"bloki w jarze:   {len(all_blocks):5d}  -> ukrywam {len(hide_blocks)}")
+    hide_blocks = sorted(
+        b for b in all_blocks
+        if not keep(b, BETA_BLOCKS) and b not in substitute)
+    hide_items = sorted(
+        i for i in (item_defs or legacy_items)
+        if not keep(i, BETA_ITEMS) and i not in SUBSTITUTIONS)
+
+    print(f"bloki w jarze:   {len(all_blocks):5d}  -> ukrywam {len(hide_blocks)},"
+          f" podstawiam {len(substitute)}")
     print(f"itemy w jarze:   {len(item_defs or legacy_items):5d}  -> ukrywam {len(hide_items)}")
 
     if args.dry_run:
-        print("\nprzykladowe bloki:", ", ".join(hide_blocks[:12]))
-        print("przykladowe itemy:", ", ".join(hide_items[:12]))
+        print("\nukrywane:   ", ", ".join(hide_blocks[:12]))
+        print("podstawiane:", ", ".join(f"{k}->{v}" for k, v in
+                                        sorted(substitute.items())[:8]))
+        print("itemy:      ", ", ".join(hide_items[:12]))
         return
 
     if fmt is None:
@@ -125,6 +143,10 @@ def main() -> None:
         # wiec nie musimy znac schematu blockstate'a.
         write(PACK / "blockstates" / f"{block}.json",
               {"variants": {"": {"model": EMPTY_MODEL}}})
+
+    for block, beta in sorted(substitute.items()):
+        write(PACK / "blockstates" / f"{block}.json",
+              {"variants": {"": {"model": f"minecraft:block/{beta}"}}})
 
     for item in hide_items:
         if item_defs:
