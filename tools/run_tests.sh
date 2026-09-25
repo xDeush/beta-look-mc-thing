@@ -7,10 +7,14 @@ cd "$(dirname "$0")/.."
 OUT=$(mktemp -d)
 trap 'rm -rf "$OUT"' EXIT
 
+# Wymieniamy pliki po nazwie, a nie cale katalogi: testujemy wylacznie klasy
+# bez zaleznosci od Minecrafta. LightmapWriter siedzi obok BetaLightmap,
+# ale uzywa loggera moda, wiec tutaj nie nalezy.
+BASE=src/client/java/com/betalook/client
 javac -d "$OUT" \
-  $(find src/client/java/com/betalook/client/light \
-         src/client/java/com/betalook/client/fog \
-         src/client/java/com/betalook/client/color -name '*.java') \
+  "$BASE/light/BetaLightmap.java" \
+  "$BASE/fog/BetaFog.java" \
+  "$BASE/color/BetaColors.java" \
   tools/test/BetaMathTest.java
 
 java -cp "$OUT" BetaMathTest
