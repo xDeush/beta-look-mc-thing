@@ -64,6 +64,8 @@ public final class BetaClouds {
                     "Chmury: {} kandydatow na pole wysokosci -- nie ruszam niczego. "
                             + "Chmury zostana na wspolczesnej wysokosci.",
                     candidates.size());
+            com.betalook.client.BetaDiagnostics.requestDump(
+                    "chmury nie znalazly pola wysokosci");
             return;
         }
 

@@ -39,7 +39,27 @@ public final class BetaDiagnostics {
             "net.minecraft.client.particle.ParticleEngine",
     };
 
+    private static boolean dumped;
+
+    /**
+     * Wolane przez modul, ktory nie znalazl tego, czego szukal.
+     *
+     * Zrzut powstaje wtedy sam, bez grzebania w configu -- bo dokladnie
+     * wtedy jest potrzebny.
+     */
+    public static void requestDump(String reason) {
+        if (dumped) {
+            return;
+        }
+        BetaLook.LOGGER.warn("Zrzucam budowe klas, bo: {}", reason);
+        dump();
+    }
+
     public static void dump() {
+        if (dumped) {
+            return;
+        }
+        dumped = true;
         Path out = FabricLoader.getInstance().getConfigDir()
                 .resolve("betalook-classes.txt");
         try {

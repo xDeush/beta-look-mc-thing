@@ -59,6 +59,8 @@ public final class LightmapWriter {
                 "Lightmapa: nie znalazlem tablicy int[{}] w {} -- cieple swiatlo "
                         + "pochodni bedzie wylaczone. Pola w tej klasie: {}",
                 SIZE, stateClass.getName(), describe(stateClass));
+        com.betalook.client.BetaDiagnostics.requestDump(
+                "lightmapa nie znalazla tablicy pikseli");
         return null;
     }
 
