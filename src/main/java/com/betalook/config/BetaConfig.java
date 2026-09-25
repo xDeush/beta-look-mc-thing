@@ -39,6 +39,14 @@ public final class BetaConfig {
     /** Void fog ponizej y=0 tak jak w becie. Domyslnie wl. */
     public static boolean voidFog = true;
 
+    /**
+     * Zapisz budowe klas renderu do config/betalook-classes.txt.
+     *
+     * Przydatne, gdy ktorys modul melduje w logu, ze nie znalazl pola --
+     * plik mowi, co w tej wersji gry faktycznie istnieje.
+     */
+    public static boolean dumpClasses = false;
+
     private BetaConfig() {}
 
     public static void load() {
@@ -64,6 +72,7 @@ public final class BetaConfig {
         betaHandSwing = bool(p, "beta_hand_swing", betaHandSwing);
         betaSmoothLighting = bool(p, "beta_smooth_lighting", betaSmoothLighting);
         voidFog = bool(p, "void_fog", voidFog);
+        dumpClasses = bool(p, "dump_classes", dumpClasses);
         BetaContent.invalidateCaches();
         save();
     }
@@ -84,6 +93,7 @@ public final class BetaConfig {
         p.setProperty("beta_hand_swing", String.valueOf(betaHandSwing));
         p.setProperty("beta_smooth_lighting", String.valueOf(betaSmoothLighting));
         p.setProperty("void_fog", String.valueOf(voidFog));
+        p.setProperty("dump_classes", String.valueOf(dumpClasses));
         try {
             Files.createDirectories(FILE.getParent());
             try (var out = Files.newOutputStream(FILE)) {

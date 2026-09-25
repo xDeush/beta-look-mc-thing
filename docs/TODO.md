@@ -1,14 +1,31 @@
 # Co zostalo
 
+## Zrobione przez wykrywanie w czasie dzialania
+
+Trzy moduly blokowaly sie na nazwach pol, ktorych nie dalo sie ustalic bez
+zdekompilowanych zrodel. Zamiast czekac, kazdy z nich znajduje sobie to,
+czego potrzebuje, sam:
+
+1. **Lightmapa** -- `LightmapWriter` szuka w `LightmapRenderState` tablicy
+   `int[256]` (16 poziomow nieba x 16 bloku) i do niej pisze. Jasnosc nieba
+   odczytuje z komorki, ktora vanilla wlasnie policzyla, wiec nie potrzebuje
+   nawet API pory dnia. Gdy pola nie ma -- loguje, co w tej klasie jest,
+   i wylacza sie.
+
+2. **Bujanie kamery** -- `WalkTracker` liczy dystans marszu i amplitude
+   wlasnym licznikiem z pozycji gracza, wzorem z bety. Nie dotyka pol
+   vanilli w ogole, wiec nie moze sie o nie rozbic.
+
+3. **Chmury** -- `BetaClouds` szuka pola wysokosci PO WARTOSCI (192, 128,
+   127 -- wysokosci uzywane przez Mojanga) i zmienia je tylko przy
+   jednoznacznym trafieniu. Dwoch kandydatow albo zero: nie rusza niczego.
+
+Gdy ktorys zamelduje w logu, ze nie trafil, ustaw `dump_classes=true`
+w `config/betalook.properties`. Mod zapisze budowe wszystkich istotnych
+klas do `config/betalook-classes.txt` -- i na tej podstawie da sie dopisac
+brakujacy kawalek bez zgadywania.
+
 ## Do dokonczenia
-
-1. **Lightmapa** -- matematyka gotowa i przetestowana, brakuje mixina.
-   Instrukcja: [`LIGHTMAP.md`](LIGHTMAP.md). To najbardziej widoczna
-   brakujaca rzecz: bez tego swiatlo pochodni jest biale, nie pomaranczowe.
-
-2. **Chmury** -- w becie na y=108, wolniejsze, bez cieniowania.
-   `CloudRenderer` istnieje i ma `TextureData`, ale nie ustalilem, skad
-   bierze wysokosc. Zacznij od `genSources` na `CloudRenderer`.
 
 3. **Smooth lighting** -- beta liczyla AO bez interpolacji po rogach,
    ktora weszla w 1.8. Flaga `beta_smooth_lighting` juz jest w configu.

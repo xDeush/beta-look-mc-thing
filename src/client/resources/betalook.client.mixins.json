@@ -6,7 +6,8 @@
 		"BiomeColorsMixin",
 		"EntityRenderDispatcherMixin",
 		"FogRendererMixin",
-		"HumanoidModelMixin"
+		"HumanoidModelMixin",
+		"LightmapMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

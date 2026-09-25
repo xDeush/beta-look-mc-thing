@@ -1,0 +1,17 @@
+{
+	"_comment": [
+		"Mixiny celujace w metody, ktorych nazw nie dalo sie zweryfikowac",
+		"wzgledem 26.2. required=false i defaultRequire=0 sprawiaja, ze",
+		"nietrafiony injection wylacza sama funkcje, zamiast wywalac gre."
+	],
+	"required": false,
+	"package": "com.betalook.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"CloudRendererMixin",
+		"GameRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 0
+	}
+}
