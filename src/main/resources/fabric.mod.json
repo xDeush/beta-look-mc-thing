@@ -21,10 +21,6 @@
 		{
 			"config": "betalook.client.mixins.json",
 			"environment": "client"
-		},
-		{
-			"config": "betalook.optional.mixins.json",
-			"environment": "client"
 		}
 	],
 	"depends": {
