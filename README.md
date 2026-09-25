@@ -43,39 +43,51 @@ wymog tego moda. Sprawdz, co masz: `java -version`. Jesli mniej niz 25, pobierz
 Build uzywa toolchaina, wiec jesli JDK 25 jest gdziekolwiek w systemie, Gradle
 go znajdzie sam -- nawet gdy JAVA_HOME wskazuje starsza wersje.
 
-### Windows (cmd)
+### Wszystko jedna komenda
 
 ```bat
 git clone -b claude/hopeful-hopper-4ypcxj https://github.com/xDeush/beta-look-mc-thing
 cd beta-look-mc-thing
-
-:: 1. Resourcepack: ukryj wszystko nowe + ujednolic drewno
-python tools\gen_hide_pack.py "%APPDATA%\.minecraft\versions\26.2\26.2.jar"
-python tools\gen_wood_overrides.py
-
-:: 2. Tekstury z twojej kopii bety
 pip install pillow
-python tools\extract_beta_textures.py "%APPDATA%\.minecraft\versions\b1.7.3\b1.7.3.jar"
-
-:: 3. Mod -- BEZ "./" na poczatku, to skladnia linuksowa
-gradlew.bat build
+python tools\setup.py
 ```
 
-Gotowy mod: `build\libs\betalook-0.2.0.jar` -> wrzuc do `%APPDATA%\.minecraft\mods`
-Resourcepack: spakuj zawartosc `resourcepack\` do zipa -> `%APPDATA%\.minecraft\resourcepacks`
+`setup.py` sam znajduje jar Twojej wersji gry, sam generuje resourcepack,
+sam go pakuje i sam wgrywa do `.minecraft`. Jesli masz gdzies jar bety --
+wyciaga z niego tekstury. Jesli mod jest zbudowany -- wgrywa i jego.
 
-### Linux / macOS
+Zostaje Ci tylko wlaczyc pack w grze: **Opcje -> Pakiety zasobow**,
+przesun BetaLook na prawa strone.
+
+Gdy cos nie pasuje:
+
+```bat
+python tools\setup.py --dry-run              :: pokaz, co znalazl, nic nie rob
+python tools\setup.py --version 26.2         :: konkretna wersja
+python tools\setup.py --mc-dir "<sciezka>"   :: Prism / MultiMC
+python tools\setup.py --beta "<jar bety>"    :: jar bety spoza .minecraft
+```
+
+Mod budujesz osobno (wymaga JDK 25):
+
+```bat
+gradlew.bat build
+python tools\setup.py
+```
+
+### Krok po kroku, gdyby setup.py zawiodl
 
 ```bash
-git clone -b claude/hopeful-hopper-4ypcxj https://github.com/xDeush/beta-look-mc-thing
-cd beta-look-mc-thing
-
-python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar
-python3 tools/gen_wood_overrides.py
-pip install pillow
+python3 tools/gen_hide_pack.py ~/.minecraft/versions/26.2/26.2.jar  # ukryj i podstaw
+python3 tools/gen_wood_overrides.py                                  # drewno -> dab
 python3 tools/extract_beta_textures.py ~/.minecraft/versions/b1.7.3/b1.7.3.jar
+python3 tools/build_pack.py                                          # spakuj
+```
 
-./gradlew build
+Diagnostyka pojedynczego bloku:
+
+```bash
+python3 tools/gen_hide_pack.py <jar> --explain leaf_litter
 ```
 
 Testy matematyki, bez Minecrafta i sieci: `./tools/run_tests.sh`
