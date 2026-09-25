@@ -15,6 +15,7 @@ javac -d "$OUT" \
   "$BASE/light/BetaLightmap.java" \
   "$BASE/fog/BetaFog.java" \
   "$BASE/color/BetaColors.java" \
+  "$BASE/sky/BetaSky.java" \
   tools/test/BetaMathTest.java
 
 java -cp "$OUT" BetaMathTest

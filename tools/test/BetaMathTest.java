@@ -1,6 +1,7 @@
 import com.betalook.client.color.BetaColors;
 import com.betalook.client.fog.BetaFog;
 import com.betalook.client.light.BetaLightmap;
+import com.betalook.client.sky.BetaSky;
 
 /**
  * Testy matematyki bety. Nie wymagaja Minecrafta ani Gradle.
@@ -18,6 +19,7 @@ public class BetaMathTest {
         testFogStartsAtQuarter();
         testVoidFogDarkens();
         testColorIndex();
+        testSkyColor();
 
         if (failures > 0) {
             System.out.println("\nNIEUDANE: " + failures);
@@ -109,6 +111,39 @@ public class BetaMathTest {
         check("zimno i mokro", BetaColors.colorIndex(0.0, 1.0) == ((255 << 8) | 255));
         int mid = BetaColors.colorIndex(0.5, 0.5);
         check("srodek mapy jest w zakresie", mid > 0 && mid < 0xFFFF);
+    }
+
+    /** Niebo z bety: blekit z przewaga kanalu niebieskiego, ciemniejace noca. */
+    private static void testSkyColor() {
+        int day = BetaSky.skyColorByTemperature(0.0F);
+        int r = (day >> 16) & 0xFF;
+        int g = (day >> 8) & 0xFF;
+        int b = day & 0xFF;
+
+        check("niebo jest niebieskie: B > G > R (" + r + "," + g + "," + b + ")",
+                b > g && g > r);
+        check("niebieski jest pelny (B=" + b + ")", b >= 250);
+
+        // Cieplejszy biom przesuwa odcien ku zieleni -- kanal G rosnie.
+        int warm = BetaSky.skyColorByTemperature(2.0F);
+        int warmG = (warm >> 8) & 0xFF;
+        check("cieplejszy biom ma wiecej zieleni (" + warmG + " > " + g + ")",
+                warmG > g);
+
+        // Pora dnia: w poludnie pelny kolor, w nocy czern.
+        int noon = BetaSky.skyColor(0.0F, 0.0F);
+        int midnight = BetaSky.skyColor(0.0F, 0.5F);
+        check("poludnie ma pelny kolor", (noon & 0xFF) >= 250);
+        check("polnoc jest czarna (" + midnight + ")", midnight == 0);
+
+        // Zmierzch miedzy nimi -- niebo przyciemnione, ale nie czarne.
+        int dusk = BetaSky.skyColor(0.0F, 0.22F);
+        int duskB = dusk & 0xFF;
+        check("zmierzch jest posredni (B=" + duskB + ")", duskB > 0 && duskB < 250);
+
+        // Konwersja HSV: pelna jasnosc i zero nasycenia to biel.
+        check("HSV(dowolny, 0, 1) == biel", BetaSky.hsvToRgb(0.3F, 0.0F, 1.0F) == 0xFFFFFF);
+        check("HSV(dowolny, dowolny, 0) == czern", BetaSky.hsvToRgb(0.3F, 1.0F, 0.0F) == 0);
     }
 
     private static void check(String name, boolean ok) {

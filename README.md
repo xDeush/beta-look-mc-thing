@@ -20,6 +20,11 @@ rzecz siedzi tam, gdzie da sie ja zrobic *dobrze*:
 - `EntityRenderDispatcherMixin` -- moby spoza bety znikaja (ale zyja i atakuja)
 - `BiomeColorsMixin` -- jednolita woda, trawa i liscie z bety
 - `HumanoidModelMixin` -- poza gracza i mobow 1:1 z `ModelBiped` z bety
+- `LightmapMixin` -- cieple swiatlo pochodni
+- `BlockModelLighterMixin` -- ukryte bloki nie rzucaja cieni AO
+- `ClientLevelSkyMixin` -- plaskie niebo z temperatury biomu
+- `ClientLevelMixin` -- czastki spoza bety nie powstaja
+- `CloudRendererMixin` -- chmury na y=108
 - `GameRendererMixin` -- bujanie kamery (opcjonalny, patrz nizej)
 
 **Resourcepack** (3 skrypty):
@@ -27,9 +32,9 @@ rzecz siedzi tam, gdzie da sie ja zrobic *dobrze*:
 - `gen_wood_overrides.py` -- cherry/mangrove/bamboo/... renderuja sie jak dab
 - `extract_beta_textures.py` -- tnie `terrain.png` z twojego jara bety
 
-**Przetestowane** (`tools/run_tests.sh`, 25 asercji, bez Minecrafta i sieci):
+**Przetestowane** (`tools/run_tests.sh`, 33 asercje, bez Minecrafta i sieci):
 krzywa jasnosci, cieplota swiatla pochodni, podloga ambientu, start mgly,
-void fog, indeks mapy kolorow.
+void fog, indeks mapy kolorow, kolor nieba i konwersja HSV.
 
 ## Szybki start
 

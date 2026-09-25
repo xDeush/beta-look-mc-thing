@@ -25,12 +25,6 @@ w `config/betalook.properties`. Mod zapisze budowe wszystkich istotnych
 klas do `config/betalook-classes.txt` -- i na tej podstawie da sie dopisac
 brakujacy kawalek bez zgadywania.
 
-## Do dokonczenia
-
-6. **Niebo** -- gradient nieba w becie szedl z temperatury biomu.
-   `SkyRenderer.renderSunriseAndSunset(PoseStack, float, int)` potwierdzony
-   w zrodlach Iris, reszta nie.
-
 ## Do sprawdzenia przy pierwszym buildzie
 
 Pelna tabela w [`SIGNATURES.md`](SIGNATURES.md). Najkrocej:
@@ -41,6 +35,17 @@ Pelna tabela w [`SIGNATURES.md`](SIGNATURES.md). Najkrocej:
 
 Jesli `HumanoidModelMixin` sie nie kompiluje, popraw te nazwy wg `genSources` --
 reszta moda jest od nich niezalezna.
+
+## Niebo
+
+`BetaSky` liczy kolor nieba wzorem z b1.7.3: temperatura biomu dzielona
+przez 3, przyciecie do -1..1, konwersja HSV gdzie temperatura przesuwa
+odcien i nasycenie, na koniec przyciemnienie pora dnia. Przy temperaturze 0
+wychodzi 127,161,255 -- ten charakterystyczny, lekko fioletowawy blekit.
+
+Wzor jest przetestowany offline (`tools/run_tests.sh`), ale hak
+`ClientLevel.getSkyColor` nie jest zweryfikowany wzgledem 26.2, wiec mixin
+siedzi w configu opcjonalnym.
 
 ## Smooth lighting: czego tu NIE ma
 
