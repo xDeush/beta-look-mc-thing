@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "betalook",
+  "version": "${version}",
+  "name": "BetaLook",
+  "description": "Sprawia, ze wspolczesny Minecraft wyglada jak Beta 1.7.3: tekstury, swiatlo, mgla, animacje i niebo z bety, a wszystko dodane po becie przestaje byc renderowane.",
+  "authors": ["xDeush"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.betalook.BetaLook"],
+    "client": ["com.betalook.client.BetaLookClient"]
+  },
+  "mixins": ["betalook.mixins.json"],
+  "accessWidener": "betalook.accesswidener",
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21"
+  }
+}
