@@ -51,11 +51,19 @@ def main() -> None:
 
     textures = SRC / "assets" / "minecraft" / "textures"
     if overlay:
-        if textures.is_dir():
-            sys.exit("BLAD: tryb nakladki, a w resourcepack/ sa tekstury.\n"
+        # Jedyny dozwolony wyjatek: zazielenione liscie. Bez nich wisnia
+        # jest szara, a pack nie ma innego sposobu, zeby to naprawic.
+        allowed = {"cherry_leaves.png", "pale_oak_leaves.png"}
+        extra = [f for f in textures.rglob("*") if f.is_file()
+                 and f.name not in allowed] if textures.is_dir() else []
+        if extra:
+            sys.exit(f"BLAD: tryb nakladki, a w resourcepack/ jest "
+                     f"{len(extra)} tekstur spoza wyjatkow, np.\n"
+                     f"      {extra[0].name}\n"
                      "      Nakladka ma NIE zawierac tekstur, zeby pack\n"
                      "      pod spodem mogl je dostarczyc.")
-        print("Tryb nakladki: bez tekstur, samo ukrywanie i podstawianie.\n")
+        print("Tryb nakladki: tylko ukrywanie, podstawianie "
+              "i zazielenione liscie.\n")
     elif not textures.is_dir():
         print("UWAGA: brak tekstur bety. Pack bedzie ukrywal nowe bloki")
         print("       i ujednolical drewno, ale tekstury zostana wspolczesne.")

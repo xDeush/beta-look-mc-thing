@@ -19,6 +19,12 @@ import zipfile
 
 from beta_lists import BETA_BLOCKS, BETA_ITEMS, POST_BETA_WOOD
 
+# Liscie bez zrodla barwy w waniliowym kodzie. Skierowanie ich na model
+# debu daje SZARE liscie, bo tekstura debu jest w odcieniach szarosci,
+# a zielen dodaje dopiero tint przypisany do bloku. Tym gatunkom podmieniamy
+# sama teksture (tools/gen_leaf_tint.py), a blockstate zostawiamy waniliowy.
+UNTINTED_LEAVES = {"cherry_leaves", "pale_oak_leaves"}
+
 SUBSTITUTIONS = {
     k: v for k, v in
     json.loads((pathlib.Path(__file__).resolve().parent / "substitutions.json").read_text()).items()
@@ -162,6 +168,8 @@ def main() -> None:
     # (bo item model idzie inna sciezka), a postawiony blok zostaje bez zmian.
     # Wskazanie wprost na model debu omija ten problem calkiem.
     for block in all_blocks:
+        if block in UNTINTED_LEAVES:
+            continue
         target = unify(block)
         if target == block or target not in all_blocks:
             continue
@@ -179,7 +187,8 @@ def main() -> None:
 
     hide_blocks = sorted(
         b for b in all_blocks
-        if not keep(b, BETA_BLOCKS) and b not in substitute and b not in broken)
+        if not keep(b, BETA_BLOCKS) and b not in substitute and b not in broken
+        and b not in UNTINTED_LEAVES)
     hide_items = sorted(
         i for i in (item_defs or legacy_items)
         if not keep(i, BETA_ITEMS) and i not in SUBSTITUTIONS)

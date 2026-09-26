@@ -57,7 +57,14 @@ def main():
             count += 1
 
     # Liscie: w becie byly tylko debowe, sosnowe i brzozowe.
+    #
+    # Wisni i bladego debu tu NIE ma. Ich bloki nie maja w waniliowym kodzie
+    # zrodla barwy, wiec model wskazujacy na szara teksture debu dalby
+    # szare liscie. Tym dwom podmieniamy sama teksture -- gen_leaf_tint.py.
+    untinted = {"cherry", "pale_oak"}
     for species in POST_BETA:
+        if species in untinted:
+            continue
         model = {"parent": "minecraft:block/leaves",
                  "textures": {"all": "minecraft:block/oak_leaves"}}
         (MODELS / f"{species}_leaves.json").write_text(json.dumps(model, indent=2) + "\n")

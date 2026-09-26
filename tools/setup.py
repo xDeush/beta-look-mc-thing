@@ -112,6 +112,42 @@ def default_mc_dir() -> pathlib.Path | None:
     return pathlib.Path.home() / ".minecraft"
 
 
+def profile_for_jar(jar: pathlib.Path, roots: list[pathlib.Path]) -> pathlib.Path | None:
+    """
+    Profil launchera pasujacy do znalezionego jara.
+
+    Modrinth App i Prism trzymaja gre w meta/ albo libraries/, wspolnej dla
+    wszystkich profili, a mody i packi w profiles/<nazwa>/. Wgranie ich obok
+    jara oznacza wgranie ich tam, gdzie gra nie zaglada.
+
+    Gdy profil jest jeden -- bierzemy go. Gdy wiecej -- ostatnio uzywany,
+    bo to na nim uzytkownik gra. Zawsze mowimy, ktory wybralismy.
+    """
+    for root in roots:
+        if root not in jar.parents:
+            continue
+        profiles = root / "profiles"
+        if not profiles.is_dir():
+            continue
+        candidates = [d for d in profiles.iterdir() if d.is_dir()]
+        if not candidates:
+            continue
+        if len(candidates) == 1:
+            return candidates[0]
+        return max(candidates, key=lambda d: d.stat().st_mtime)
+    return None
+
+
+def base_version(name: str) -> str:
+    """
+    Sama wersja gry z nazwy folderu.
+
+    Modrinth nazywa wersje "26.2-0.19.5", doklejajac wersje loadera.
+    Bez odciecia tego mod pod 26.2 wygladal na niezgodny z wlasna wersja.
+    """
+    return name.split("-")[0]
+
+
 def mod_target_version() -> str | None:
     """Wersja, pod ktora zbudowany jest mod -- z gradle.properties."""
     props = ROOT / "gradle.properties"
@@ -195,7 +231,7 @@ def find_game_jar(roots: list[pathlib.Path], wanted: str | None) -> pathlib.Path
     # wiec pack wygenerowany z innego jara ukrywa i podstawia nie to co trzeba.
     target = mod_target_version()
     if target:
-        exact = [j for j in vanilla if j.parent.name == target]
+        exact = [j for j in vanilla if base_version(j.parent.name) == target]
         if exact:
             return exact[0]
 
@@ -289,7 +325,7 @@ def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
     say("  wymaga, zeby mod sie zaladowal -- patrz nizej.")
 
     target = mod_target_version()
-    launched = game_jar.parent.name
+    launched = base_version(game_jar.parent.name)
     if target and launched != target:
         say()
         say(f"  UWAGA: mod jest zbudowany pod {target}, a uzyty jar to")
@@ -397,18 +433,28 @@ def main() -> None:
         if not mc_dir.is_dir():
             sys.exit(f"Nie ma takiego katalogu: {mc_dir}")
     else:
-        mc_dir = game_jar.parent.parent.parent
-        if not (mc_dir / "resourcepacks").is_dir():
-            mc_dir = roots[0]
+        profile = profile_for_jar(game_jar, roots)
+        if profile is not None:
+            mc_dir = profile
+            say(f"Profil launchera: {profile.name}")
+            say("(inny? podaj --game-dir)")
+        else:
+            mc_dir = game_jar.parent.parent.parent
+            if not (mc_dir / "resourcepacks").is_dir():
+                mc_dir = roots[0]
 
     say(f"\nJar gry:    {game_jar}")
     say(f"Minecraft:  {mc_dir}")
 
     if args.hide_only:
         beta_jar = None
-        say("Tryb: NAKLADKA -- samo ukrywanie, bez tekstur.")
+        beta_source = find_beta_jar(roots, args.beta)
+        say("Tryb: NAKLADKA -- bez tekstur, poza zazielenionymi liscmi.")
+        if beta_source is None:
+            say("UWAGA: brak jara bety -- wisniowe liscie zostana waniliowe.")
     else:
         beta_jar = find_beta_jar(roots, args.beta)
+        beta_source = beta_jar
         say(f"Jar bety:   "
               f"{beta_jar if beta_jar else '(brak -- tekstury zostana wspolczesne)'}")
 
@@ -435,6 +481,11 @@ def main() -> None:
     if args.hide_only:
         pack_name = "BetaLook-Hide.zip"
         build_args = ["--overlay", "--out", pack_name]
+        # Wisnia i blady dab nie maja zrodla barwy, wiec musza dostac
+        # wlasna, juz zazielenienona teksture -- inaczej beda szare.
+        if beta_source and not run("gen_leaf_tint.py", str(beta_source)):
+            say("UWAGA: nie zrobilem zazielenionych lisci -- wisnia "
+                "moze byc szara.")
     else:
         pack_name = "BetaLook.zip"
         build_args = []
