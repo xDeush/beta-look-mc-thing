@@ -17,11 +17,17 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "resourcepack"
-OUT = ROOT / "build" / "BetaLook.zip"
+DEFAULT_OUT = "BetaLook.zip"
 
 
 def main() -> None:
     force = "--force" in sys.argv
+    overlay = "--overlay" in sys.argv
+
+    name = DEFAULT_OUT
+    if "--out" in sys.argv:
+        name = sys.argv[sys.argv.index("--out") + 1]
+    out = ROOT / "build" / name
 
     if not (SRC / "pack.mcmeta").is_file():
         sys.exit(f"Brakuje {SRC / 'pack.mcmeta'} -- uruchom najpierw gen_hide_pack.py")
@@ -44,17 +50,23 @@ def main() -> None:
             "Jesli swiadomie chcesz pack z samymi teksturami: --force")
 
     textures = SRC / "assets" / "minecraft" / "textures"
-    if not textures.is_dir():
+    if overlay:
+        if textures.is_dir():
+            sys.exit("BLAD: tryb nakladki, a w resourcepack/ sa tekstury.\n"
+                     "      Nakladka ma NIE zawierac tekstur, zeby pack\n"
+                     "      pod spodem mogl je dostarczyc.")
+        print("Tryb nakladki: bez tekstur, samo ukrywanie i podstawianie.\n")
+    elif not textures.is_dir():
         print("UWAGA: brak tekstur bety. Pack bedzie ukrywal nowe bloki")
         print("       i ujednolical drewno, ale tekstury zostana wspolczesne.")
         print("       Zeby to zmienic: tools/extract_beta_textures.py\n")
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    if OUT.exists():
-        OUT.unlink()
+    out.parent.mkdir(parents=True, exist_ok=True)
+    if out.exists():
+        out.unlink()
 
     count = 0
-    with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as zf:
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for path in sorted(SRC.rglob("*")):
             if path.is_file():
                 # arcname wzgledem SRC -- dzieki temu pack.mcmeta laduje
@@ -62,8 +74,8 @@ def main() -> None:
                 zf.write(path, path.relative_to(SRC).as_posix())
                 count += 1
 
-    size = OUT.stat().st_size / 1024
-    print(f"Spakowano {count} plikow -> {OUT}  ({size:.0f} KB)")
+    size = out.stat().st_size / 1024
+    print(f"Spakowano {count} plikow -> {out}  ({size:.0f} KB)")
     print()
     print("Wrzuc ten plik do:")
     print(r"  Windows:  %APPDATA%\.minecraft\resourcepacks")

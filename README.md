@@ -48,6 +48,17 @@ wymog tego moda. Sprawdz, co masz: `java -version`. Jesli mniej niz 25, pobierz
 Build uzywa toolchaina, wiec jesli JDK 25 jest gdziekolwiek w systemie, Gradle
 go znajdzie sam -- nawet gdy JAVA_HOME wskazuje starsza wersje.
 
+### Masz juz pack z teksturami bety?
+
+Zbuduj sama nakladke ukrywajaca -- bez tekstur, do polozenia NAD nim:
+
+```bat
+python tools\\setup.py --hide-only
+```
+
+Powstaje `BetaLook-Hide.zip`. W grze ustaw go WYZEJ niz swoj pack
+z teksturami: on daje wyglad, nasz decyduje, co sie w ogole rysuje.
+
 ### Wszystko jedna komenda
 
 ```bat

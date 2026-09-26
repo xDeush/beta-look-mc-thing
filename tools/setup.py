@@ -241,7 +241,7 @@ class Tee:
 
 
 def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
-           beta_jar: pathlib.Path | None) -> None:
+           beta_jar: pathlib.Path | None, overlay_mode: bool = False) -> None:
     """
     Mowi wprost, co zadziala, a co nie.
 
@@ -255,9 +255,12 @@ def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
     print("  Zawsze: ukrywanie blokow i itemow spoza bety, podstawianie")
     print("          kamieni i ziemi, drewno renderowane jak dab.")
 
-    if beta_jar:
+    if overlay_mode:
+        print("  Tryb nakladki: pack NIE zawiera tekstur. Poloz go NAD")
+        print("  swoim packiem z teksturami bety w Opcje -> Pakiety zasobow.")
+    elif beta_jar:
         print("  Tekstury bety: TAK")
-    else:
+    elif not overlay_mode:
         print()
         print("  TEKSTURY BETY: NIE -- i to jest najwieksza brakujaca czesc.")
         print("  Nie znalazlem jara bety, wiec tekstury zostaja wspolczesne.")
@@ -322,6 +325,9 @@ def main() -> None:
                          "(Modrinth App, Prism, CurseForge)")
     ap.add_argument("--version")
     ap.add_argument("--beta")
+    ap.add_argument("--hide-only", action="store_true",
+                    help="zbuduj nakladke, ktora TYLKO ukrywa tresci spoza "
+                         "bety -- bez tekstur, do polozenia NAD innym packiem")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
@@ -375,8 +381,13 @@ def main() -> None:
     print(f"\nJar gry:    {game_jar}")
     print(f"Minecraft:  {mc_dir}")
 
-    beta_jar = find_beta_jar(roots, args.beta)
-    print(f"Jar bety:   {beta_jar if beta_jar else '(brak -- tekstury zostana wspolczesne)'}")
+    if args.hide_only:
+        beta_jar = None
+        print("Tryb: NAKLADKA -- samo ukrywanie, bez tekstur.")
+    else:
+        beta_jar = find_beta_jar(roots, args.beta)
+        print(f"Jar bety:   "
+              f"{beta_jar if beta_jar else '(brak -- tekstury zostana wspolczesne)'}")
 
     if args.dry_run:
         print("\n--dry-run: nic nie zapisuje.")
@@ -392,19 +403,28 @@ def main() -> None:
             shutil.rmtree(target)
             print(f"Usunieto stare: {target}")
 
-    if not run("gen_hide_pack.py", str(game_jar)):
+    hide_args = ["--overlay"] if args.hide_only else []
+    if not run("gen_hide_pack.py", str(game_jar), *hide_args):
         sys.exit("gen_hide_pack.py nie przeszedl -- przerywam.")
     if not run("gen_wood_overrides.py"):
         sys.exit("gen_wood_overrides.py nie przeszedl -- przerywam.")
-    if beta_jar and not run("extract_beta_textures.py", str(beta_jar)):
-        print("UWAGA: wyciaganie tekstur nie przeszlo, ide dalej bez nich.")
-    if not run("build_pack.py"):
+
+    if args.hide_only:
+        pack_name = "BetaLook-Hide.zip"
+        build_args = ["--overlay", "--out", pack_name]
+    else:
+        pack_name = "BetaLook.zip"
+        build_args = []
+        if beta_jar and not run("extract_beta_textures.py", str(beta_jar)):
+            print("UWAGA: wyciaganie tekstur nie przeszlo, ide dalej bez nich.")
+
+    if not run("build_pack.py", *build_args):
         sys.exit("build_pack.py nie przeszedl -- przerywam.")
 
     packs = mc_dir / "resourcepacks"
     packs.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT / "build" / "BetaLook.zip", packs / "BetaLook.zip")
-    print(f"\nPack wgrany:  {packs / 'BetaLook.zip'}")
+    shutil.copy2(ROOT / "build" / pack_name, packs / pack_name)
+    print(f"\nPack wgrany:  {packs / pack_name}")
 
     mod_jars = sorted((ROOT / "build" / "libs").glob("betalook-*.jar")) \
         if (ROOT / "build" / "libs").is_dir() else []
@@ -417,7 +437,7 @@ def main() -> None:
     else:
         print("Mod:          nie zbudowany (uruchom gradlew build) -- pomijam")
 
-    report(mc_dir, game_jar, beta_jar)
+    report(mc_dir, game_jar, beta_jar, args.hide_only)
     print()
     print(f"Caly ten log zapisalem tez w: {log_path}")
 

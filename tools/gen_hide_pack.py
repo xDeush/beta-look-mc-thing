@@ -106,6 +106,8 @@ def main() -> None:
     ap.add_argument("jar", type=pathlib.Path, help="jar wersji, na ktorej grasz")
     ap.add_argument("--dry-run", action="store_true",
                     help="tylko pokaz, ile czego zostaloby ukryte")
+    ap.add_argument("--overlay", action="store_true",
+                    help="pack bedzie nakladka na inny pack z teksturami bety")
     ap.add_argument("--explain", metavar="BLOK",
                     help="powiedz, co pack robi z tym blokiem, i wyjdz")
     args = ap.parse_args()
@@ -220,6 +222,9 @@ def main() -> None:
         print("itemy:      ", ", ".join(hide_items[:12]))
         return
 
+    description = ("BetaLook - tylko ukrywanie (nakladka)" if args.overlay
+                   else "BetaLook - wyglad Minecraft Beta 1.7.3")
+
     if fmt is None:
         # Nie znamy numeru, wiec deklarujemy szeroki zakres obslugiwanych
         # formatow. Gra przyjmie pack zamiast oznaczac go jako niezgodny.
@@ -230,14 +235,14 @@ def main() -> None:
             "pack": {
                 "pack_format": 64,
                 "supported_formats": {"min_inclusive": 15, "max_inclusive": 200},
-                "description": "BetaLook - wyglad Minecraft Beta 1.7.3",
+                "description": description,
             },
         })
     else:
         write(PACK.parent.parent / "pack.mcmeta", {
             "pack": {
                 "pack_format": fmt,
-                "description": "BetaLook - wyglad Minecraft Beta 1.7.3",
+                "description": description,
             },
         })
         print(f"pack_format odczytany z jara: {fmt}")

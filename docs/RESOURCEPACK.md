@@ -1,5 +1,26 @@
 # Resourcepack
 
+## Nakladka: samo ukrywanie, bez tekstur
+
+Jesli masz juz wlasny pack z teksturami bety, nie potrzebujesz naszych tekstur --
+tylko warstwy, ktora ukryje wszystko, czego w becie nie bylo:
+
+```bat
+python tools\setup.py --hide-only --game-dir "<profil launchera>"
+```
+
+Powstaje `BetaLook-Hide.zip`: zero tekstur, same blockstate'y. W grze
+**poloz go NAD** swoim packiem z teksturami (wyzej na liscie po prawej).
+Pack pod spodem dostarcza wyglad, nasz decyduje, co w ogole ma sie rysowac.
+
+To dziala tym lepiej, im pelniejszy jest pack pod spodem: podstawienia
+kieruja granit na model `minecraft:block/stone`, wiec granit dostanie
+betowa teksture kamienia z TWOJEGO packa. Tak samo drewno -- wisnia
+uzyje Twojej tekstury debu.
+
+Nakladka nie zawiera zadnego pliku PNG i skrypt tego pilnuje: przy
+`--overlay` przerwie, gdyby jakies tekstury zostaly w katalogu.
+
 ## Uzycie w trzech krokach
 
 ```bat
