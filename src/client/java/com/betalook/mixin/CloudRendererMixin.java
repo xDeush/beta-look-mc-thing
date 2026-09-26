@@ -2,8 +2,7 @@ package com.betalook.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.betalook.client.sky.BetaClouds;
 import com.betalook.config.BetaConfig;
@@ -11,19 +10,19 @@ import com.betalook.config.BetaConfig;
 import net.minecraft.client.renderer.CloudRenderer;
 
 /**
- * Obniza chmury do poziomu z bety (y=108) zaraz po utworzeniu renderera.
+ * Chmury na wysokosci z bety.
  *
- * Nie znam nazwy pola wysokosci w 26.2, wiec BetaClouds szuka go po wartosci
- * i dziala tylko przy jednoznacznym trafieniu. Mixin siedzi w configu
- * opcjonalnym, wiec brak trafienia nie psuje gry.
+ * W b1.7.3 wisialy na y=108 -- nisko, jak sufit tuz nad glowa. Wspolczesnie
+ * sa duzo wyzej i z ziemi widac je jako cienka warstwe przy horyzoncie.
+ *
+ * Wysokosc przychodzi jako pierwszy argument typu float do render(). Nie ma
+ * jej w zadnym polu klasy, wiec podmieniamy sam argument.
  */
 @Mixin(CloudRenderer.class)
 public class CloudRendererMixin {
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void betalook$lowerClouds(CallbackInfo ci) {
-        if (BetaConfig.betaClouds) {
-            BetaClouds.apply(this);
-        }
+    @ModifyVariable(method = "render", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private float betalook$lowerClouds(float height) {
+        return BetaConfig.betaClouds ? BetaClouds.BETA_HEIGHT : height;
     }
 }

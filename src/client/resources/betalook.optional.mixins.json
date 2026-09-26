@@ -9,9 +9,7 @@
 	"compatibilityLevel": "JAVA_25",
 	"client": [
 		"ClientLevelMixin",
-		"ClientLevelSkyMixin",
-		"CloudRendererMixin",
-		"GameRendererMixin"
+		"ClientLevelSkyMixin"
 	],
 	"injectors": {
 		"defaultRequire": 0

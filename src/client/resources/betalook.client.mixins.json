@@ -5,8 +5,10 @@
 	"client": [
 		"BiomeColorsMixin",
 		"BlockModelLighterMixin",
+		"CloudRendererMixin",
 		"EntityRenderDispatcherMixin",
 		"FogRendererMixin",
+		"GameRendererMixin",
 		"HumanoidModelMixin",
 		"LightmapMixin"
 	],

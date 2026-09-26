@@ -32,6 +32,8 @@ public final class WalkTracker {
     private static float bob;
     private static float prevBob;
 
+    private static long lastTickNanos;
+
     public static void register() {
         ClientTickEvents.END_CLIENT_TICK.register(WalkTracker::tick);
     }
@@ -67,6 +69,23 @@ public final class WalkTracker {
 
         prevBob = bob;
         bob += (target - bob) * 0.4F;
+
+        lastTickNanos = System.nanoTime();
+    }
+
+    /**
+     * Ulamek ticku, liczony z czasu od ostatniego ticku.
+     *
+     * Metoda bobView nie dostaje juz partialTick, a bez niego bujanie
+     * skakaloby dwadziescia razy na sekunde zamiast plynac. Tick trwa 50 ms,
+     * wiec wystarczy zmierzyc, ile z niego uplynelo.
+     */
+    public static float partialTick() {
+        if (lastTickNanos == 0L) {
+            return 0.0F;
+        }
+        float elapsed = (System.nanoTime() - lastTickNanos) / 50_000_000.0F;
+        return elapsed < 0.0F ? 0.0F : (elapsed > 1.0F ? 1.0F : elapsed);
     }
 
     /** Dystans marszu z interpolacja miedzy tickami. */
