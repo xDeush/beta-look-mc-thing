@@ -1,0 +1,1265 @@
+BetaLook -- budowa klas renderu w tej wersji gry
+Wyslij ten plik, jesli ktorys modul sie nie wlacza.
+
+=== net.minecraft.client.renderer.state.LightmapRenderState
+  pole   boolean needsUpdate
+  pole   float blockFactor
+  pole   Vector3fc blockLightTint
+  pole   float skyFactor
+  pole   Vector3fc skyLightColor
+  pole   Vector3fc ambientColor
+  pole   float brightness
+  pole   float darknessEffectScale
+  pole   float nightVisionEffectIntensity
+  pole   Vector3fc nightVisionColor
+  pole   float bossOverlayWorldDarkening
+  pole   Map renderStateData
+  metoda Object getData(RenderStateDataKey)
+  metoda void setData(RenderStateDataKey, Object)
+  metoda Object getDataOrDefault(RenderStateDataKey, Object)
+  metoda void clearExtraData()
+
+=== net.minecraft.client.renderer.LightmapRenderStateExtractor
+  pole   Vector3fc WHITE
+  pole   boolean needsUpdate
+  pole   GameRenderer renderer
+  pole   Minecraft minecraft
+  pole   RandomSource randomSource
+  pole   float blockLightFlicker
+  metoda void extract(LightmapRenderState, float)
+  metoda void tick()
+  metoda void handler$dll000$flashback$extractReturn(LightmapRenderState, float, CallbackInfo)
+  metoda void handler$zzf000$betalook$betaLightmap(LightmapRenderState, float, CallbackInfo)
+  metoda float calculateDarknessScale(LivingEntity, float, float)
+
+=== net.minecraft.client.renderer.CloudRenderer
+  pole   int FLAG_INSIDE_FACE
+  pole   int FLAG_USE_TOP_COLOR
+  pole   float CELL_SIZE_IN_BLOCKS
+  pole   int TICKS_PER_CELL
+  pole   float BLOCKS_PER_SECOND
+  pole   int UBO_SIZE
+  pole   Logger LOGGER
+  pole   Identifier TEXTURE_LOCATION
+  pole   long EMPTY_CELL
+  pole   int COLOR_OFFSET
+  pole   int NORTH_OFFSET
+  pole   int EAST_OFFSET
+  pole   int SOUTH_OFFSET
+  pole   int WEST_OFFSET
+  pole   boolean needsRebuild
+  pole   int prevCellX
+  pole   int prevCellZ
+  pole   RelativeCameraPos prevRelativeCameraPos
+  pole   CloudStatus prevCloudStatus
+  pole   TextureData texture
+  pole   int quadCount
+  pole   MappableRingBuffer ubo
+  pole   MappableRingBuffer utb
+  pole   Identifier fabric$id
+  metoda void apply(Object, ResourceManager, ProfilerFiller)
+  metoda void apply(Optional, ResourceManager, ProfilerFiller)
+  metoda void close()
+  metoda Object prepare(ResourceManager, ProfilerFiller)
+  metoda Optional prepare(ResourceManager, ProfilerFiller)
+  metoda String lambda$new$0()
+  metoda void render(int, CloudStatus, float, int, Vec3, long, float)
+  metoda void buildMesh(RelativeCameraPos, ByteBuffer, int, int, boolean, int)
+  metoda void encodeFace(ByteBuffer, int, int, Direction, int)
+  metoda Identifier fabric$getId()
+  metoda void endFrame()
+  metoda void handler$zzi000$betalook$lowerClouds(CallbackInfo)
+  metoda String lambda$render$0()
+  metoda String lambda$render$1()
+  metoda void markForRebuild()
+  metoda boolean isEastEmpty(long)
+  metoda void tryBuildCell(RelativeCameraPos, ByteBuffer, int, int, boolean, int, int, int, int, long[])
+  metoda boolean isSouthEmpty(long)
+  metoda void buildFlatCell(ByteBuffer, int, int)
+  metoda void buildExtrudedCell(RelativeCameraPos, ByteBuffer, int, int, long)
+  metoda long packCellData(int, boolean, boolean, boolean, boolean)
+  metoda boolean isWestEmpty(long)
+  metoda int getSizeForCloudDistance(int)
+  metoda boolean isNorthEmpty(long)
+  metoda boolean isCellEmpty(int)
+
+=== net.minecraft.client.renderer.SkyRenderer
+  pole   Identifier SUN_SPRITE
+  pole   Identifier END_FLASH_SPRITE
+  pole   Identifier END_SKY_LOCATION
+  pole   float SKY_DISC_RADIUS
+  pole   int SKY_VERTICES
+  pole   int STAR_COUNT
+  pole   float SUN_SIZE
+  pole   float SUN_HEIGHT
+  pole   float MOON_SIZE
+  pole   float MOON_HEIGHT
+  pole   int SUNRISE_STEPS
+  pole   int END_SKY_QUAD_COUNT
+  pole   float END_FLASH_HEIGHT
+  pole   float END_FLASH_SCALE
+  pole   TextureAtlas celestialsAtlas
+  pole   RenderTarget renderTarget
+  pole   GpuBuffer starBuffer
+  pole   GpuBuffer topSkyBuffer
+  pole   GpuBuffer bottomSkyBuffer
+  pole   GpuBuffer endSkyBuffer
+  pole   GpuBuffer sunBuffer
+  pole   GpuBuffer moonBuffer
+  pole   GpuBuffer sunriseBuffer
+  pole   GpuBuffer endFlashBuffer
+  pole   AutoStorageIndexBuffer quadIndices
+  pole   AbstractTexture endSkyTexture
+  pole   int starIndexCount
+  metoda void close()
+  metoda String lambda$new$0()
+  metoda String lambda$new$1()
+  metoda GpuBuffer buildStars()
+  metoda void renderSun(float, PoseStack)
+  metoda void renderMoon(MoonPhase, float, PoseStack)
+  metoda void extractRenderState(ClientLevel, float, Camera, SkyRenderState)
+  metoda String lambda$renderSunriseAndSunset$0()
+  metoda String lambda$buildCelestialQuad$0(String)
+  metoda AbstractTexture getTexture(TextureManager, Identifier)
+  metoda void renderSunMoonAndStars(PoseStack, float, float, float, MoonPhase, float, float)
+  metoda void renderSkyDisc(int)
+  metoda void renderEndSky()
+  metoda void renderDarkDisc()
+  metoda void renderSunriseAndSunset(PoseStack, float, int)
+  metoda void renderEndFlash(PoseStack, float, float, float)
+  metoda void buildSkyDisc(VertexConsumer, float)
+  metoda String lambda$renderStars$0()
+  metoda GpuBuffer buildMoonPhases(TextureAtlas)
+  metoda GpuBuffer buildSunQuad(TextureAtlas)
+  metoda GpuBuffer buildCelestialQuad(String, TextureAtlasSprite)
+  metoda GpuBuffer buildEndSky()
+  metoda String lambda$renderEndFlash$0()
+  metoda String lambda$renderEndSky$0()
+  metoda String lambda$renderMoon$0()
+  metoda String lambda$renderSun$0()
+  metoda String lambda$buildEndSky$0()
+  metoda String lambda$buildMoonPhases$0()
+  metoda GpuBuffer buildEndFlashQuad(TextureAtlas)
+  metoda String lambda$renderDarkDisc$0()
+  metoda String lambda$buildStars$0()
+  metoda void renderStars(float, PoseStack)
+  metoda String lambda$buildSunriseFan$0()
+  metoda GpuBuffer buildSunriseFan()
+  metoda String lambda$renderSkyDisc$0()
+  metoda boolean shouldRenderDarkDisc(float, ClientLevel)
+
+=== net.minecraft.client.player.LocalPlayer
+  pole   Logger LOGGER
+  pole   int POSITION_REMINDER_INTERVAL
+  pole   int WATER_VISION_MAX_TIME
+  pole   int WATER_VISION_QUICK_TIME
+  pole   float WATER_VISION_QUICK_PERCENT
+  pole   double SUFFOCATING_COLLISION_CHECK_SCALE
+  pole   double MINOR_COLLISION_ANGLE_THRESHOLD_RADIAN
+  pole   ClientPacketListener connection
+  pole   StatsCounter stats
+  pole   ClientRecipeBook recipeBook
+  pole   TickThrottler dropSpamThrottler
+  pole   List ambientSoundHandlers
+  pole   PermissionSet permissions
+  pole   ChatAbilities chatAbilities
+  pole   double xLast
+  pole   double yLast
+  pole   double zLast
+  pole   float yRotLast
+  pole   float xRotLast
+  pole   boolean lastOnGround
+  pole   boolean lastHorizontalCollision
+  pole   boolean crouching
+  pole   boolean wasSprinting
+  pole   int positionReminder
+  pole   boolean flashOnSetHealth
+  pole   ClientInput input
+  pole   Input lastSentInput
+  pole   Minecraft minecraft
+  pole   int sprintTriggerTime
+  pole   int EXPERIENCE_DISPLAY_UNREADY_TO_SET
+  pole   int EXPERIENCE_DISPLAY_READY_TO_SET
+  pole   int experienceDisplayStartTick
+  pole   float yBob
+  pole   float xBob
+  pole   float yBobO
+  pole   float xBobO
+  pole   int jumpRidingTicks
+  pole   float jumpRidingScale
+  pole   float portalEffectIntensity
+  pole   float oPortalEffectIntensity
+  pole   boolean startedUsingItem
+  pole   InteractionHand usingItemHand
+  pole   boolean handsBusy
+  pole   boolean autoJumpEnabled
+  pole   int autoJumpTime
+  pole   boolean wasFallFlying
+  pole   int waterVisionTime
+  pole   boolean showDeathScreen
+  pole   boolean doLimitedCrafting
+  metoda PermissionSet permissions()
+  metoda HitResult pick(Entity, double, double, float)
+  metoda void move(MoverType, Vec3)
+  metoda void setPermissions(PermissionSet)
+  metoda void tick()
+  metoda boolean drop(boolean)
+  metoda void sendPosition()
+  metoda boolean modifyExpressionValue$cel000$fabric-content-registries-v0$preventSprintingInFluid(boolean)
+  metoda boolean modifyExpressionValue$cel000$fabric-content-registries-v0$handleCustomDownSwimmableFluids(boolean)
+  metoda boolean modifyExpressionValue$cel000$fabric-content-registries-v0$handleCustomSwimming(boolean)
+  metoda StatsCounter getStats()
+  metoda void updateTutorialInventoryAction(ItemStack, ItemStack, ClickAction)
+  metoda void sendIsSprintingIfNeeded()
+  metoda boolean isHorizontalCollisionMinor(Vec3)
+  metoda boolean canSpawnSprintParticle()
+  metoda boolean isUnderWater()
+  metoda float getViewXRot(float)
+  metoda boolean startRiding(Entity, boolean, boolean)
+  metoda void moveTowardsClosestSpace(double, double)
+  metoda void respawn()
+  metoda Vec2 modifyInputSpeedForSquareMovement(Vec2)
+  metoda void wrapOperation$dkj000$flashback$playSound(Level, double, double, double, SoundEvent, SoundSource, float, float, boolean, Operation)
+  metoda Transition getActivePortalLocalTransition()
+  metoda Void mixinextras$bridge$playLocalSound$111(Object[])
+  metoda void setExperienceDisplayStartTickToTickCount()
+  metoda void handlePortalTransitionEffect(boolean)
+  metoda boolean updateIsUnderwater()
+  metoda void sendSystemMessage(Component)
+  metoda InteractionHand getUsedItemHand()
+  metoda void sendOverlayMessage(Component)
+  metoda boolean isUsingItem()
+  metoda boolean canDropItems()
+  metoda boolean isLocalPlayer()
+  metoda boolean isShiftKeyDown()
+  metoda void setReducedDebugInfo(boolean)
+  metoda void handleCreativeModeItemDrop(ItemStack)
+  metoda void closeContainer()
+  metoda void handleEntityEvent(byte)
+  metoda void openMinecartCommandBlock(MinecartCommandBlock)
+  metoda void openJigsawBlock(JigsawBlockEntity)
+  metoda void openItemGui(ItemStack, InteractionHand)
+  metoda void openTestBlock(TestBlockEntity)
+  metoda void openStructureBlock(StructureBlockEntity)
+  metoda void openTestInstanceBlock(TestInstanceBlockEntity)
+  metoda void openTextEdit(SignBlockEntity, boolean)
+  metoda boolean isTextFilteringEnabled()
+  metoda void openCommandBlock(CommandBlockEntity)
+  metoda void removeVehicle()
+  metoda float getViewYRot(float)
+  metoda void startUsingItem(InteractionHand)
+  metoda void onSyncedDataUpdated(EntityDataAccessor)
+  metoda void stopUsingItem()
+  metoda float getVisualRotationYInDegrees()
+  metoda boolean isSuppressingSlidingDownLadder()
+  metoda float getCurrentMood()
+  metoda ChatAbilities chatAbilities()
+  metoda void tickDeath()
+  metoda void swing(InteractionHand)
+  metoda void heal(float)
+  metoda void hurtTo(float)
+  metoda void resetPos()
+  metoda void playSound(SoundEvent, float, float)
+  metoda void aiStep()
+  metoda void rideTick()
+  metoda void openDialog(Holder)
+  metoda void magicCrit(Entity)
+  metoda void crit(Entity)
+  metoda ClientRecipeBook getRecipeBook()
+  metoda PacketContext getPacketContext()
+  metoda Vec3 getRopeHoldPosition(float)
+  metoda boolean isCrouching()
+  metoda boolean shouldRotateWithMinecart()
+  metoda void applyInput()
+  metoda boolean isMoving()
+  metoda void onUpdateAbilities()
+  metoda void refreshChatAbilities()
+  metoda float getJumpRidingScale()
+  metoda boolean isMovingSlowly()
+  metoda boolean isControlledCamera()
+  metoda void setExperienceValues(float, int, int)
+  metoda Vec2 modifyInput(Vec2)
+  metoda boolean suffocatesAt(BlockPos)
+  metoda boolean shouldStopSwimSprinting()
+  metoda boolean shouldStopRunSprinting()
+  metoda boolean isSlowDueToUsingItem()
+  metoda boolean shouldShowDeathScreen()
+  metoda PlayerRideableJumping jumpableVehicle()
+  metoda float itemUseSpeedMultiplier()
+  metoda void setDoLimitedCrafting(boolean)
+  metoda float distanceToUnitSquare(Vec2)
+  metoda void setShowDeathScreen(boolean)
+  metoda boolean isSprintingPossible(boolean)
+  metoda void clientSideCloseContainer()
+  metoda boolean getDoLimitedCrafting()
+  metoda boolean isHandsBusy()
+  metoda boolean canStartSprinting()
+  metoda void sendRidingJump()
+  metoda void sendOpenInventory()
+  metoda void removeRecipeHighlight(RecipeDisplayId)
+  metoda HitResult filterHitResult(HitResult, Vec3, double)
+  metoda float getWaterVision()
+  metoda void updateAutoJump(float, float)
+  metoda Stream lambda$updateAutoJump$0(VoxelShape)
+  metoda Input getLastSentInput()
+  metoda HitResult raycastHitResult(float, Entity)
+  metoda boolean vehicleCanSprint(Entity)
+  metoda boolean canAutoJump()
+  metoda void onGameModeChanged(GameType)
+  metoda TickThrottler getDropSpamThrottler()
+  metoda boolean isAutoJumpEnabled()
+
+=== net.minecraft.world.entity.Entity
+  pole   Logger LOGGER
+  pole   String TAG_ID
+  pole   String TAG_UUID
+  pole   String TAG_PASSENGERS
+  pole   String TAG_DATA
+  pole   String TAG_POS
+  pole   String TAG_MOTION
+  pole   String TAG_ROTATION
+  pole   String TAG_PORTAL_COOLDOWN
+  pole   String TAG_NO_GRAVITY
+  pole   String TAG_AIR
+  pole   String TAG_ON_GROUND
+  pole   String TAG_FALL_DISTANCE
+  pole   String TAG_FIRE
+  pole   String TAG_SILENT
+  pole   String TAG_GLOWING
+  pole   String TAG_INVULNERABLE
+  pole   String TAG_CUSTOM_NAME
+  pole   int INVALID_ENTITY_ID
+  pole   int CONTENTS_SLOT_INDEX
+  pole   int BOARDING_COOLDOWN
+  pole   int TOTAL_AIR_SUPPLY
+  pole   int MAX_ENTITY_TAG_COUNT
+  pole   Codec TAG_LIST_CODEC
+  pole   double DEFAULT_NAME_TAG_DISTANCE
+  pole   double DEFAULT_BELOW_NAME_DISTANCE
+  pole   double MAX_NAME_TAG_DISTANCE
+  pole   float DELTA_AFFECTED_BY_BLOCKS_BELOW_0_2
+  pole   double DELTA_AFFECTED_BY_BLOCKS_BELOW_0_5
+  pole   double DELTA_AFFECTED_BY_BLOCKS_BELOW_1_0
+  pole   int BASE_TICKS_REQUIRED_TO_FREEZE
+  pole   int FREEZE_HURT_FREQUENCY
+  pole   int BASE_SAFE_FALL_DISTANCE
+  pole   AABB INITIAL_AABB
+  pole   double WATER_FLOW_SCALE
+  pole   double LAVA_FAST_FLOW_SCALE
+  pole   double LAVA_SLOW_FLOW_SCALE
+  pole   int MAX_BLOCK_ITERATIONS_ALONG_TRAVEL_PER_TICK
+  pole   double MAX_MOVEMENT_RESETTING_TRACE_DISTANCE
+  pole   double viewScale
+  pole   EntityType type
+  pole   boolean requiresPrecisePosition
+  pole   int id
+  pole   boolean blocksBuilding
+  pole   ImmutableList passengers
+  pole   int boardingCooldown
+  pole   Entity vehicle
+  pole   Level level
+  pole   double xo
+  pole   double yo
+  pole   double zo
+  pole   Vec3 position
+  pole   BlockPos blockPosition
+  pole   ChunkPos chunkPosition
+  pole   Vec3 deltaMovement
+  pole   float yRot
+  pole   float xRot
+  pole   float yRotO
+  pole   float xRotO
+  pole   AABB bb
+  pole   boolean onGround
+  pole   boolean horizontalCollision
+  pole   boolean verticalCollision
+  pole   boolean verticalCollisionBelow
+  pole   boolean minorHorizontalCollision
+  pole   boolean hurtMarked
+  pole   Vec3 stuckSpeedMultiplier
+  pole   RemovalReason removalReason
+  pole   float DEFAULT_BB_WIDTH
+  pole   float DEFAULT_BB_HEIGHT
+  pole   float moveDist
+  pole   float flyDist
+  pole   double fallDistance
+  pole   float nextStep
+  pole   double xOld
+  pole   double yOld
+  pole   double zOld
+  pole   boolean noPhysics
+  pole   RandomSource random
+  pole   int tickCount
+  pole   int remainingFireTicks
+  pole   EntityFluidInteraction fluidInteraction
+  pole   boolean wasTouchingWater
+  pole   boolean wasEyeInWater
+  pole   int invulnerableTime
+  pole   boolean firstTick
+  pole   SynchedEntityData entityData
+  pole   EntityDataAccessor DATA_SHARED_FLAGS_ID
+  pole   int FLAG_ONFIRE
+  pole   int FLAG_SHIFT_KEY_DOWN
+  pole   int FLAG_SPRINTING
+  pole   int FLAG_SWIMMING
+  pole   int FLAG_INVISIBLE
+  pole   int FLAG_GLOWING
+  pole   int FLAG_FALL_FLYING
+  pole   EntityDataAccessor DATA_AIR_SUPPLY_ID
+  pole   EntityDataAccessor DATA_CUSTOM_NAME
+  pole   EntityDataAccessor DATA_CUSTOM_NAME_VISIBLE
+  pole   EntityDataAccessor DATA_SILENT
+  pole   EntityDataAccessor DATA_NO_GRAVITY
+  pole   EntityDataAccessor DATA_POSE
+  pole   EntityDataAccessor DATA_TICKS_FROZEN
+  pole   EntityInLevelCallback levelCallback
+  pole   VecDeltaCodec packetPositionCodec
+  pole   boolean needsSync
+  pole   boolean syncPosition
+  pole   PortalProcessor portalProcess
+  pole   int portalCooldown
+  pole   boolean invulnerable
+  pole   UUID uuid
+  pole   String stringUUID
+  pole   boolean hasGlowingTag
+  pole   Set tags
+  pole   double[] pistonDeltas
+  pole   long pistonDeltasGameTime
+  pole   EntityDimensions dimensions
+  pole   float eyeHeight
+  pole   boolean isInPowderSnow
+  pole   boolean wasInPowderSnow
+  pole   Optional mainSupportingBlockPos
+  pole   boolean onGroundNoBlocks
+  pole   float crystalSoundIntensity
+  pole   int lastCrystalSoundPlayTick
+  pole   boolean hasVisualFire
+  pole   Vec3 lastKnownSpeed
+  pole   Vec3 lastKnownPosition
+  pole   BlockState inBlockState
+  pole   int MAX_MOVEMENTS_HANDELED_PER_TICK
+  pole   ArrayDeque movementThisTick
+  pole   List finalMovementsThisTick
+  pole   LongSet visitedBlocks
+  pole   StepBasedCollector insideEffectCollector
+  pole   CustomData customData
+  pole   boolean permanentVehicle
+  pole   EntityEventsGroup events
+  pole   Vec3 pos1
+  pole   Vec3 motion
+  pole   LifetimeTrackerTargetImpl lifeTimeTrackerHook$TISCM
+  pole   ThreadLocal ofemContext
+  pole   ThreadLocal ofemCurrentMovement
+  pole   Set wasTouchingCustomFluid
+  pole   IdentityHashMap dataAttachments
+  pole   IdentityHashMap syncedAttachments
+  pole   Set deferredSyncedAttachments
+  pole   IdentityHashMap attachedChangedListeners
+  pole   EntitySpawnReason fabric_spawnReason
+  pole   boolean fabric_isLoadedFromDisk
+  pole   PermissionContext context
+  pole   Tracker movementTracker$TISCM
+  metoda Component getName()
+  metoda void remove(RemovalReason)
+  metoda Object get(DataComponentType)
+  metoda boolean equals(Object)
+  metoda String toString()
+  metoda int hashCode()
+  metoda void load(ValueInput)
+  metoda Vec3 position()
+  metoda Component getTypeName()
+  metoda boolean is(Entity)
+  metoda boolean isAlive()
+  metoda int getId()
+  metoda boolean save(ValueOutput)
+  metoda EntityType getType()
+  metoda SlotAccess getSlot(int)
+  metoda HitResult pick(double, float, boolean)
+  metoda Vec3 collide(Vec3)
+  metoda float rotate(Rotation)
+  metoda void push(Vec3)
+  metoda void push(double, double, double)
+  metoda void push(Entity)
+  metoda Level level()
+  metoda Component getDisplayName()
+  metoda void move(MoverType, Vec3)
+  metoda void tick()
+  metoda boolean isSupportedBy(BlockPos)
+  metoda Style lambda$getDisplayName$0(Style)
+  metoda void setLevel(Level)
+  metoda Vec3 getPosition(float)
+  metoda void kill(ServerLevel)
+  metoda void mdb7a083$carpet-tis-addition$lambda$onMovementModified_piston$0$b(Vec3, Tracker)
+  metoda void mdb7a083$fabric-data-attachment-api-v1$lambda$fabric_syncChange$0$8(AttachmentSyncPredicate, AttachmentChange, ServerPlayer)
+  metoda void mdb7a083$fabric-data-attachment-api-v1$lambda$onAttachedSet$2$7(OnAttachedSet[], Object, Object)
+  metoda void mdb7a083$carpet-tis-addition$lambda$onMovementModified_collision$0$9(Vec3, Tracker)
+  metoda void mdb7a083$carpet-tis-addition$lambda$onMovementModified_sneaking$0$a(Vec3, Tracker)
+  metoda double getY()
+  metoda double getY(double)
+  metoda void mdb7a083$fabric-data-attachment-api-v1$lambda$fabric_readAttachmentsFromNbt$0$4(AttachmentType, Object)
+  metoda AttachmentChange mdb7a083$fabric-data-attachment-api-v1$lambda$fabric_sendAndClearDeferredSyncChanges$0$3(AttachmentType)
+  metoda boolean modifyExpressionValue$bml000$carpet-tis-addition$optimizedFastEntityMovement_theCollisionsListParameterIsIncompleteSoDontReturnEvenIfItIsEmpty(boolean)
+  metoda OnAttachedSet mdb7a083$fabric-data-attachment-api-v1$lambda$onAttachedSet$1$6(OnAttachedSet[])
+  metoda AttachmentChange mdb7a083$fabric-data-attachment-api-v1$lambda$fabric_updateSyncTarget$0$2(AttachmentTargetInfo, AttachmentTargetInfo, AttachmentType, AttachmentChange)
+  metoda Event mdb7a083$fabric-data-attachment-api-v1$lambda$onAttachedSet$0$5(AttachmentType)
+  metoda void handler$bgd000$carpet-tis-addition$onMovementStart_movementLogger(MoverType, Vec3, CallbackInfo)
+  metoda void handler$bgd000$carpet-tis-addition$onMovementEnd_movementLogger(CallbackInfo)
+  metoda void handler$bgd000$carpet-tis-addition$onMovementModified_piston(MoverType, Vec3, CallbackInfo)
+  metoda void handler$bgd000$carpet-tis-addition$onMovementModified_sneaking(MoverType, Vec3, CallbackInfo)
+  metoda Vec3 localvar$bgd000$carpet-tis-addition$onMovementModified_collision(Vec3)
+  metoda boolean modifyReturnValue$ceg000$fabric-content-registries-v0$checkForCustomFluids(boolean)
+  metoda double modifyExpressionValue$bjf000$carpet-tis-addition$dontYeetItsSpeed(double)
+  metoda void handler$cfh000$fabric-data-attachment-api-v1$readEntityAttachments(ValueInput, CallbackInfo)
+  metoda void handler$cfh000$fabric-data-attachment-api-v1$writeEntityAttachments(ValueOutput, CallbackInfo)
+  metoda void handler$zne000$carpet-tis-addition$lifetimeTracker_recordRemoval_void(CallbackInfo)
+  metoda int modifyExpressionValue$caj000$carpet-tis-addition$modifyVoidRelatedAltitude(int)
+  metoda void handler$zla000$carpet-tis-addition$dontMoveVisualizeProjectile(CallbackInfo)
+  metoda EntityDimensions getDimensions(Pose)
+  metoda void setId(int)
+  metoda void discard()
+  metoda RandomSource getRandom()
+  metoda void handler$zmo000$carpet-tis-addition$lifetimeTracker_recordRemoval_finalFallback(CallbackInfo)
+  metoda Vec3 localvar$bml000$carpet-tis-addition$optimizedFastEntityMovement_checkMovement(Vec3)
+  metoda boolean modifyExpressionValue$ceg000$fabric-content-registries-v0$checkIfUnderSwimmableFluid(boolean, LocalRef)
+  metoda boolean modifyExpressionValue$ceg000$fabric-content-registries-v0$checkIfInSwimmableFluid(boolean)
+  metoda boolean wrapOperation$ceg000$fabric-content-registries-v0$checkIfStandingInSwimmableFluid(FluidState, TagKey, Operation, LocalRef)
+  metoda boolean modifyReturnValue$ceg000$fabric-content-registries-v0$handleCustomFluidInteractionUpdates(boolean)
+  metoda boolean modifyReturnValue$ceg000$fabric-content-registries-v0$preventParticlesInFluids(boolean)
+  metoda ItemEntity modifyReturnValue$zpk000$carpet-tis-addition$lifetimeTracker_recordSpawning_mobDrop_common(ItemEntity)
+  metoda BlockParticleOption modifyExpressionValue$coc000$fabric-particles-v1$modifyBlockStateParticleOption(BlockParticleOption, BlockPos)
+  metoda Entity wrapOperation$chd000$fabric-entity-events-v1$afterDimensionChanged(Entity, ServerLevel, ServerLevel, TeleportTransition, Operation)
+  metoda boolean isRemoved()
+  metoda void lambda$load$0(UUID)
+  metoda void setInvisible(boolean)
+  metoda BlockPos getPrimaryStepSoundBlockPos(BlockPos)
+  metoda void handler$zoe000$carpet-tis-addition$lifetimeTracker_recordRemoval_vehicleMounting(CallbackInfoReturnable)
+  metoda boolean modifyExpressionValue$ceg000$fabric-content-registries-v0$checkCustomFluids(boolean)
+  metoda void handler$zod000$carpet-tis-addition$lifetimeTracker_recordRemoval_transDimension(CallbackInfoReturnable, ServerLevel)
+  metoda Entity modifyReturnValue$bbb000$carpet-tis-addition$lifetimeTracker_recordSpawning_transDimension(Entity)
+  metoda double getZ()
+  metoda double getZ(double)
+  metoda double getX(double)
+  metoda double getX()
+  metoda void lookAt(Anchor, Vec3)
+  metoda void setPortalTimer(int)
+  metoda int getTrackId$TISCM()
+  metoda void recordRemoval$TISCM(RemovalReason)
+  metoda void notifyLeashHolder(Leashable)
+  metoda Vec3 getRemovalPosition$TISCM()
+  metoda void registerDebugValues(ServerLevel, Registration)
+  metoda Object castComponentValue(DataComponentType, Object)
+  metoda boolean mayInteract(ServerLevel, BlockPos)
+  metoda boolean applyImplicitComponent(DataComponentType, Object)
+  metoda Vec3[] getQuadLeashHolderOffsets()
+  metoda void onExplosionHit(Entity)
+  metoda int getPortalTimer()
+  metoda Vec3 getKnownSpeed()
+  metoda void notifyLeasheeRemoved(Leashable)
+  metoda ItemStack getPickResult()
+  metoda void applyImplicitComponents(DataComponentGetter)
+  metoda Vec3 getSpawningPosition$TISCM()
+  metoda long getLifeTime$TISCM()
+  metoda void setIsInPowderSnow(boolean)
+  metoda void setLevelCallback(EntityInLevelCallback)
+  metoda boolean isFlyingVehicle()
+  metoda AABB getFluidInteractionBox()
+  metoda void unsetRemoved()
+  metoda void setPermanentVehicle(boolean)
+  metoda boolean supportQuadLeashAsHolder()
+  metoda ItemEntity spawnAtLocation(ServerLevel, ItemLike)
+  metoda ItemEntity spawnAtLocation(ServerLevel, ItemStack, float)
+  metoda ItemEntity spawnAtLocation(ServerLevel, ItemStack, Vec3)
+  metoda ItemEntity spawnAtLocation(ServerLevel, ItemStack)
+  metoda boolean hasCustomName()
+  metoda void recordSpawning$TISCM(SpawningReason)
+  metoda String getStringUUID()
+  metoda boolean hasIndirectPassenger(Entity)
+  metoda boolean hasGlowingTag()
+  metoda void ejectPassengers()
+  metoda VecDeltaCodec getPositionCodec()
+  metoda boolean getRequiresPrecisePosition()
+  metoda void onPassengerTurned(Entity)
+  metoda void igniteForSeconds(float)
+  metoda void clearFreeze()
+  metoda Vec3 limitPistonMovement(Vec3)
+  metoda boolean isHorizontalCollisionMinor(Vec3)
+  metoda BlockPos getOnPosLegacy()
+  metoda int getTeamColor()
+  metoda void onClientRemoval()
+  metoda void setBoundingBox(AABB)
+  metoda void handlePortal()
+  metoda void processPortalCooldown()
+  metoda int getRemainingFireTicks()
+  metoda boolean isColliding(BlockPos, BlockState)
+  metoda int getPortalCooldown()
+  metoda void checkSupportingBlock(boolean, Vec3)
+  metoda boolean canSpawnSprintParticle()
+  metoda void setOnGroundWithMovement(boolean, Vec3)
+  metoda void setOnGroundWithMovement(boolean, boolean, Vec3)
+  metoda boolean isOnPortalCooldown()
+  metoda void checkBelowWorld()
+  metoda void setPortalCooldown()
+  metoda void setPortalCooldown(int)
+  metoda void computeSpeed()
+  metoda void setRequiresPrecisePosition(boolean)
+  metoda void spawnSprintParticle()
+  metoda boolean shouldPlayLavaHurtSound()
+  metoda void addMovementThisTick(Movement)
+  metoda List collectAllColliders(Entity, Level, AABB)
+  metoda boolean isSuppressingBounce()
+  metoda void processFlappingMovement()
+  metoda Vec3 collideBoundingBox(Entity, Vec3, AABB, Level, List)
+  metoda Vec3 collideBoundingBox(CollisionContext, Vec3, AABB, Level, List)
+  metoda int checkInsideBlocks(Vec3, Vec3, StepBasedCollector, LongSet, int)
+  metoda void checkInsideBlocks(List, StepBasedCollector)
+  metoda void extinguishFire()
+  metoda double getAvailableSpaceBelow(double)
+  metoda Vec3 collideWithShapes(Vec3, AABB, List)
+  metoda void walkingStepSound(BlockPos, BlockState)
+  metoda Vec3 oldPosition()
+  metoda void clearMovementThisTick()
+  metoda boolean isAffectedByBlocks()
+  metoda boolean isStateClimbable(BlockState)
+  metoda double getBlockBounciness(Block)
+  metoda boolean isNoGravity()
+  metoda BlockState lambda$checkFallDamage$0(BlockPos)
+  metoda void playSwimSound(float)
+  metoda boolean isInShallowWater()
+  metoda void playAmethystStepSound()
+  metoda boolean dampensVibrations()
+  metoda boolean lambda$checkInsideBlocks$0(int, AtomicInteger, boolean, Vec3, Vec3, LongSet, boolean, AABB, StepBasedCollector, BlockPos, int)
+  metoda void onInsideBlock(BlockState)
+  metoda BlockPos adjustSpawnLocation(ServerLevel, BlockPos)
+  metoda void debugBlockIntersection(ServerLevel, BlockPos, boolean, boolean)
+  metoda void doCheckFallDamage(double, double, double, boolean)
+  metoda boolean touchingUnloadedChunk()
+  metoda void propagateFallToPassengers(double, float, DamageSource)
+  metoda Boolean mixinextras$bridge$is$635(Object[])
+  metoda boolean isUnderWater()
+  metoda void applyGravity()
+  metoda void setNoGravity(boolean)
+  metoda boolean collidedWithFluid(FluidState, BlockPos, Vec3, Vec3)
+  metoda BlockState getBlockStateOn()
+  metoda Vec3 getLightProbePosition(float)
+  metoda void setOldPosAndRot(Vec3, float, float)
+  metoda void setOldPosAndRot()
+  metoda boolean canBePickedFromInside()
+  metoda void setCustomName(Component)
+  metoda Component getCustomName()
+  metoda float getEyeHeight()
+  metoda float getEyeHeight(Pose)
+  metoda void setGlowingTag(boolean)
+  metoda Vec3 getInputVector(Vec3, float, float)
+  metoda boolean shouldRender(double, double, double)
+  metoda String getEncodeId()
+  metoda boolean isPassengerOfSameVehicle(Entity)
+  metoda IllegalStateException lambda$getEncodeId$0()
+  metoda boolean lambda$isInWall$0(AABB, BlockPos)
+  metoda boolean lambda$interact$0(Player, Leashable)
+  metoda boolean repositionEntityAfterLoad()
+  metoda void fillCrashReportCategory(CrashReportCategory)
+  metoda boolean dropAllLeashConnections(Player)
+  metoda void absSnapRotationTo(float, float)
+  metoda Vec3 getUpVector(float)
+  metoda void saveWithoutId(ValueOutput)
+  metoda boolean saveAsPassenger(ValueOutput)
+  metoda boolean canBeHitByProjectile()
+  metoda boolean shouldRenderAtSqrDistance(double)
+  metoda void setCustomNameVisible(boolean)
+  metoda Direction getNearestViewDirection()
+  metoda Vec3 calculateUpVector(float, float)
+  metoda float getViewXRot(float)
+  metoda RemovalReason getRemovalReason()
+  metoda Vec2 getRotationVector()
+  metoda EntityAttachments getAttachments()
+  metoda void setAsInsidePortal(Portal, BlockPos)
+  metoda void addPassenger(Entity)
+  metoda boolean startRiding(Entity)
+  metoda boolean startRiding(Entity, boolean, boolean)
+  metoda boolean couldAcceptPassenger()
+  metoda void lambda$startRiding$1(Entity)
+  metoda boolean canAddPassenger(Entity)
+  metoda void removePassenger(Entity)
+  metoda boolean lambda$removePassenger$0(Entity, Entity)
+  metoda boolean isDescending()
+  metoda boolean canCollideWith(Entity)
+  metoda float getPickRadius()
+  metoda boolean hasPassenger(Entity)
+  metoda boolean hasPassenger(Predicate)
+  metoda void moveOrInterpolateTo(Vec3, float, float)
+  metoda void moveOrInterpolateTo(float, float)
+  metoda void moveOrInterpolateTo(Vec3)
+  metoda void moveOrInterpolateTo(Optional, Optional, Optional)
+  metoda Vec3 getHandHoldingItemAngle(Item)
+  metoda boolean lambda$startRiding$0(Entity)
+  metoda boolean canControlVehicle()
+  metoda void setShiftKeyDown(boolean)
+  metoda boolean showVehicleHealth()
+  metoda boolean isVisuallyCrawling()
+  metoda boolean canTeleport(Level, Level)
+  metoda boolean isInvisibleTo(Player)
+  metoda boolean canBeCollidedWith(Entity)
+  metoda Vec3 getVehicleAttachmentPoint(Entity)
+  metoda Entity getFirstPassenger()
+  metoda Vec3 getHeadLookAngle()
+  metoda boolean isSteppingCarefully()
+  metoda boolean considersEntityAsAlly(Entity)
+  metoda int getTicksRequiredToFreeze()
+  metoda void positionRider(Entity)
+  metoda void positionRider(Entity, MoveFunction)
+  metoda Iterable getIndirectPassengers()
+  metoda void sendBubbleColumnParticles(Level, BlockPos)
+  metoda boolean isIgnoringBlockTriggers()
+  metoda void handleOnAboveBubbleColumn(Entity, boolean, BlockPos)
+  metoda void copyPosition(Entity)
+  metoda void forceSetRotation(float, boolean, float, boolean)
+  metoda void placePortalTicket(BlockPos)
+  metoda void handleOnInsideBubbleColumn(Entity, boolean)
+  metoda void moveTowardsClosestSpace(double, double, double)
+  metoda PathElement problemPath()
+  metoda boolean displayFireAnimation()
+  metoda void restoreFrom(Entity)
+  metoda double getViewScale()
+  metoda void setViewScale(double)
+  metoda void teleportSetPosition(PositionMoveRotation, PositionMoveRotation, Set)
+  metoda void teleportSetPosition(PositionMoveRotation, Set)
+  metoda Entity teleportSameDimension(ServerLevel, TeleportTransition)
+  metoda boolean shouldBlockExplode(Explosion, BlockGetter, BlockPos, BlockState, float)
+  metoda Component belowNameDisplay()
+  metoda void teleportSpectators(TeleportTransition, ServerLevel)
+  metoda Entity teleportCrossDimension(ServerLevel, ServerLevel, TeleportTransition)
+  metoda Component removeAction(Component)
+  metoda void setInvulnerable(boolean)
+  metoda void teleportPassengers()
+  metoda void checkDespawn()
+  metoda Direction getMotionDirection()
+  metoda Entity getRootVehicle()
+  metoda Entity getControlledVehicle()
+  metoda Packet getAddEntityPacket(ServerEntity)
+  metoda PushReaction getPistonPushReaction()
+  metoda Direction getDirection()
+  metoda void fixupDimensions()
+  metoda void stopSeenByPlayer(ServerPlayer)
+  metoda boolean hasControllingPassenger()
+  metoda void teleportRelative(double, double, double)
+  metoda boolean broadcastToPlayer(ServerPlayer)
+  metoda Stream getPassengersAndSelf()
+  metoda int countPlayerPassengers()
+  metoda void startSeenByPlayer(ServerPlayer)
+  metoda Stream getSelfAndPassengers()
+  metoda boolean ignoreExplosion(Explosion)
+  metoda Vec3 trackingPosition()
+  metoda int getNetherPortalCooldown()
+  metoda Object setAttached(AttachmentType, Object)
+  metoda PermissionContext getPermissionContext()
+  metoda void fabric_setSpawnReason(EntitySpawnReason)
+  metoda void fabric_setLoadedFromDisk(boolean)
+  metoda boolean isLoadedFromDisk()
+  metoda boolean fabric_shouldTryToSync()
+  metoda void fabric_updateSyncTarget(AttachmentTargetInfo, AttachmentTargetInfo)
+  metoda RegistryAccess fabric_getRegistryAccess()
+  metoda void setMovementTracker$TISCM(Tracker)
+  metoda AttachmentTargetInfo fabric_getSyncTargetInfo()
+  metoda boolean hasAttached(AttachmentType)
+  metoda Map fabric_getAttachments()
+  metoda void acknowledgeSynced(AttachmentType, Object)
+  metoda Object getAttached(AttachmentType)
+  metoda void acknowledgeSyncedEntry(AttachmentType, AttachmentChange)
+  metoda void callDoWaterSplashEffect()
+  metoda EntitySpawnReason spawnReason()
+  metoda Event onAttachedSet(AttachmentType)
+  metoda void fabric_syncChange(AttachmentType, AttachmentChange)
+  metoda int getIdField$TISCM()
+  metoda Optional getMovementTracker$TISCM()
+  metoda boolean removeTag(String)
+  metoda RegistryAccess registryAccess()
+  metoda boolean isPassenger()
+  metoda boolean isEyeInFluid(TagKey)
+  metoda void defineSynchedData(Builder)
+  metoda void setOnGround(boolean)
+  metoda Vec3 getLookAngle()
+  metoda void doWaterSplashEffect()
+  metoda void makeStuckInBlock(BlockState, Vec3)
+  metoda void setSharedFlag(int, boolean)
+  metoda void updateSwimming()
+  metoda boolean isEffectiveAi()
+  metoda boolean killedEntity(ServerLevel, LivingEntity, DamageSource)
+  metoda boolean canSimulateMovement()
+  metoda boolean isLocalClientAuthoritative()
+  metoda void playCombinationStepSounds(BlockState, BlockState)
+  metoda boolean isClientAuthoritative()
+  metoda void setSwimming(boolean)
+  metoda void playStepSound(BlockPos, BlockState)
+  metoda boolean causeFallDamage(double, float, DamageSource)
+  metoda void playMuffledStepSound(BlockState)
+  metoda void waterSwimSound()
+  metoda SoundEvent getSwimSplashSound()
+  metoda void onAboveBubbleColumn(boolean, BlockPos)
+  metoda boolean isShiftKeyDown()
+  metoda void onInsideBubbleColumn(boolean)
+  metoda SoundEvent getSwimSound()
+  metoda int getDimensionChangingDelay()
+  metoda SoundSource getSoundSource()
+  metoda AABB makeBoundingBox(Vec3)
+  metoda AABB makeBoundingBox()
+  metoda void resetFallDistance()
+  metoda int getFireImmuneTicks()
+  metoda boolean isSpectator()
+  metoda ItemStack getWeaponItem()
+  metoda void reapplyPosition()
+  metoda void setDeltaMovement(double, double, double)
+  metoda void setDeltaMovement(Vec3)
+  metoda void playerTouch(Player)
+  metoda AABB getBoundingBox()
+  metoda void handleEntityEvent(byte)
+  metoda void setSharedFlagOnFire(boolean)
+  metoda BlockPos blockPosition()
+  metoda void readAdditionalSaveData(ValueInput)
+  metoda void addAdditionalSaveData(ValueOutput)
+  metoda void removeVehicle()
+  metoda Vec3 getDeltaMovement()
+  metoda boolean hurtOrSimulate(DamageSource, float)
+  metoda Vec3 getKnownMovement()
+  metoda boolean isSprinting()
+  metoda Vec3 maybeBackOffFromEdge(Vec3, MoverType)
+  metoda boolean isAttackable()
+  metoda boolean skipAttackInteraction(Entity)
+  metoda void setSprinting(boolean)
+  metoda double distanceToSqr(Vec3)
+  metoda double distanceToSqr(double, double, double)
+  metoda double distanceToSqr(Entity)
+  metoda void setYBodyRot(float)
+  metoda void setYHeadRot(float)
+  metoda InterpolationHandler getInterpolation()
+  metoda void applyEffectsFromBlocks(List)
+  metoda void applyEffectsFromBlocks()
+  metoda void applyEffectsFromBlocks(Vec3, Vec3)
+  metoda boolean isInWaterOrRain()
+  metoda float getViewYRot(float)
+  metoda Vec3 getRelativePortalPosition(Axis, FoundRectangle)
+  metoda void setTicksFrozen(int)
+  metoda boolean isInterpolating()
+  metoda boolean isFullyFrozen()
+  metoda void recreateFromPacket(ClientboundAddEntityPacket)
+  metoda boolean canUsePortal(boolean)
+  metoda void syncPacketPositionCodec(double, double, double)
+  metoda void igniteForTicks(int)
+  metoda float getPreciseBodyRotation(float)
+  metoda void onSyncedDataUpdated(List)
+  metoda void onSyncedDataUpdated(EntityDataAccessor)
+  metoda boolean isInvulnerableToBase(DamageSource)
+  metoda ChunkPos chunkPosition()
+  metoda int getAirSupply()
+  metoda void setAirSupply(int)
+  metoda int getMaxAirSupply()
+  metoda void checkFallDamage(double, boolean, BlockState, BlockPos)
+  metoda boolean dismountsUnderwater()
+  metoda boolean updateFluidInteraction()
+  metoda boolean isInvisible()
+  metoda float getPercentFrozen()
+  metoda void updateDataBeforeSync()
+  metoda BlockState getBlockStateOnLegacy()
+  metoda int getTicksFrozen()
+  metoda List getPassengers()
+  metoda boolean isInvulnerable()
+  metoda void refreshDimensions()
+  metoda boolean isCurrentlyGlowing()
+  metoda boolean getSharedFlag(int)
+  metoda void awardKillScore(Entity, DamageSource)
+  metoda float getYHeadRot()
+  metoda Optional getLootTable()
+  metoda Vec3 calculateViewVector(float, float)
+  metoda BlockState getInBlockState()
+  metoda int getMaxFallDistance()
+  metoda Vec3 getPassengerRidingPosition(Entity)
+  metoda void onBelowWorld()
+  metoda void addDeltaMovement(Vec3)
+  metoda void moveRelative(float, Vec3)
+  metoda boolean isCustomNameVisible()
+  metoda boolean omnidirectionalAirMover()
+  metoda float getBlockJumpFactor()
+  metoda double getEffectiveGravity()
+  metoda double getEntityBounciness()
+  metoda double getDefaultGravity()
+  metoda float getBbHeight()
+  metoda void handleDamageEvent(DamageSource)
+  metoda double getFluidJumpThreshold()
+  metoda LivingEntity getControllingPassenger()
+  metoda boolean canInteractWithLevel()
+  metoda double getFluidHeight(TagKey)
+  metoda void setUUID(UUID)
+  metoda Vec3 mdb7a083$carpet-tis-addition$lambda$static$1$0()
+  metoda void handler$cgl000$fabric-debug-api-v1$addDebugValues(ServerLevel, Registration, CallbackInfo)
+  metoda OFEMContext mdb7a083$carpet-tis-addition$lambda$static$0$1()
+  metoda Set modify$ceg000$fabric-content-registries-v0$addCustomTags(Set)
+  metoda void handler$cfh000$fabric-data-attachment-api-v1$setId(int, CallbackInfo)
+  metoda boolean wrapOperation$dha000$flashback$startRiding_isClientSide(Level, Operation)
+  metoda Entity mixinextras$bridge$teleportCrossDimension$636(Object[])
+  metoda Set fabric_api$getTouchedCustomFluids()
+  metoda Vec3 getPassengerAttachmentPoint(Entity, EntityDimensions, float)
+  metoda float getVisualRotationYInDegrees()
+  metoda boolean collidedWithShapeMovingFrom(Vec3, Vec3, List)
+  metoda float getLightLevelDependentMagicValue()
+  metoda RandomSource wrapOperation$dgn000$flashback$initRandom(Operation)
+  metoda void restituteMovementAfterCollisions(BlockState, boolean, boolean, Vec3)
+  metoda void removeLatestMovementRecording()
+  metoda double applyPistonMovementRestriction(Axis, double)
+  metoda boolean hasMovedHorizontallyRecently()
+  metoda List collectCollidersIgnoringWorldBorder(Entity, Level, List, AABB)
+  metoda List collectCollidersIgnoringWorldBorder(CollisionContext, Level, List, AABB)
+  metoda void handler$zgg000$carpet$onRemove(CallbackInfo)
+  metoda void applyMovementEmissionAndPlaySound(MovementEmission, Vec3, BlockPos, BlockState)
+  metoda Iterable mixinextras$bridge$getBlockCollisions$634(Object[])
+  metoda boolean shouldPlayAmethystStepSound(BlockState)
+  metoda void handler$ccl000$entityview$alwaysRender(double, CallbackInfoReturnable)
+  metoda void applyEffectsFromBlocksForLastMovements()
+  metoda float[] collectCandidateStepUpHeights(AABB, List, float, float)
+  metoda RandomSource mixinextras$bridge$create$637(Object[])
+  metoda void handler$zgg000$carpet$onTickCall(CallbackInfo)
+  metoda boolean vibrationAndSoundEffectsFromBlock(BlockPos, BlockState, boolean, boolean, Vec3)
+  metoda void playEntityOnFireExtinguishedSound()
+  metoda String lambda$fillCrashReportCategory$2()
+  metoda void updateDynamicGameEventListener(BiConsumer)
+  metoda boolean lambda$countPlayerPassengers$0(Entity)
+  metoda Vec3 getCollisionHorizontalEscapeVector(double, double, float)
+  metoda CommandSourceStack createCommandSourceStackForNameResolution(ServerLevel)
+  metoda boolean hasExactlyOnePlayerPassenger()
+  metoda Stream getIndirectPassengersStream()
+  metoda Boolean mixinextras$bridge$isClientSide$638(Object[])
+  metoda void handler$zeh000$carpet$isFakePlayer(CallbackInfoReturnable)
+  metoda Vec3 getDefaultPassengerAttachmentPoint(Entity, Entity, EntityAttachments)
+  metoda void lambda$teleportPassengers$0(Entity)
+  metoda void handler$dha000$flashback$isInvisibleTo(Player, CallbackInfoReturnable)
+  metoda void removeAfterChangingDimensions()
+  metoda void lambda$moveOrInterpolateTo$1(Float)
+  metoda void sendTeleportTransitionToRidingPlayers(TeleportTransition)
+  metoda boolean shearOffAllLeashConnections(Player)
+  metoda float getBlockExplosionResistance(Explosion, BlockGetter, BlockPos, BlockState, FluidState, float)
+  metoda boolean isInvulnerableToPiercingWeapon()
+  metoda String lambda$fillCrashReportCategory$0()
+  metoda String lambda$fillCrashReportCategory$3()
+  metoda Iterator lambda$getIndirectPassengers$0()
+  metoda String lambda$fillCrashReportCategory$1()
+  metoda boolean fudgePositionAfterSizeChange(EntityDimensions)
+  metoda TeleportTransition calculatePassengerTransition(TeleportTransition, Entity)
+  metoda void lambda$moveOrInterpolateTo$0(Float)
+  metoda BlockPos getBlockPosBelowThatAffectsMyMovement()
+  metoda boolean isLocalInstanceAuthoritative()
+  metoda void checkFallDistanceAccumulation()
+  metoda Vec3 getDismountLocationForPassenger(LivingEntity)
+  metoda void fabric_writeAttachmentsToNbt(ValueOutput)
+  metoda void fabric_computeInitialSyncChanges(ServerPlayer, Consumer)
+  metoda void applyComponentsFromItemStack(ItemStack)
+  metoda void fabric_readAttachmentsFromNbt(ValueInput)
+  metoda Stream cm$getIndirectPassengersStream()
+  metoda int getPublicNetherPortalCooldown()
+  metoda boolean fabric_hasPersistentAttachments()
+  metoda void fabric_sendAndClearDeferredSyncChanges(List)
+  metoda boolean applyImplicitComponentIfPresent(DataComponentGetter, DataComponentType)
+  metoda void setPublicNetherPortalCooldown(int)
+  metoda void handler$zgg000$carpet$firstPos(CallbackInfo)
+  metoda void fabric_clearDeferredSyncChanges()
+  metoda AABB modifyPassengerFluidInteractionBox(AABB)
+  metoda void handler$zgg000$carpet$secondPos(CallbackInfo)
+  metoda void lerpPositionAndRotationStep(int, double, double, double, double, double)
+  metoda float getBlockSpeedFactor()
+  metoda boolean isInLiquid()
+  metoda boolean isSilent()
+  metoda double getEyeY()
+  metoda boolean isInWall()
+  metoda void onRemoval(RemovalReason)
+  metoda void baseTick()
+  metoda void setYRot(float)
+  metoda double getRandomY(double)
+  metoda double getRandomY()
+  metoda void markHurt()
+  metoda double getRandomZ(double)
+  metoda UUID getUUID()
+  metoda double getRandomX(double)
+  metoda Iterable wrapOperation$bml000$carpet-tis-addition$optimizedFastEntityMovement_dontUseThatLargeBlockCollisions(Level, Entity, AABB, Operation)
+  metoda void args$bml000$carpet-tis-addition$optimizedFastEntityMovement_useTheAxisOnlyBlockCollisionsForSpeed(Args)
+  metoda void handler$bbc000$carpet-tis-addition$lifetimeTracker_recordSpawning_vehicleDismounting_common(CallbackInfo)
+  metoda void setPos(double, double, double)
+  metoda void setPos(Vec3)
+  metoda void playSound(SoundEvent, float, float)
+  metoda void playSound(SoundEvent)
+  metoda boolean isSwimming()
+  metoda float getYRot(float)
+  metoda float getYRot()
+  metoda Entity getVehicle()
+  metoda void rideTick()
+  metoda void setPose(Pose)
+  metoda void stopRiding()
+  metoda void gameEvent(Holder, Entity)
+  metoda void gameEvent(Holder)
+  metoda boolean hurtServer(ServerLevel, DamageSource, float)
+  metoda void clearFire()
+  metoda boolean isAlliedTo(Entity)
+  metoda boolean isAlliedTo(Team)
+  metoda float maxUpStep()
+  metoda boolean onGround()
+  metoda InteractionResult interact(Player, InteractionHand, Vec3)
+  metoda PlayerTeam getTeam()
+  metoda boolean isPickable()
+  metoda boolean isDiscrete()
+  metoda boolean isInWater()
+  metoda float getXRot()
+  metoda float getXRot(float)
+  metoda boolean canSprint()
+  metoda void handler$col000$fabric-permission-api-v1$createPermissionContext(EntityType, Level, CallbackInfo)
+  metoda void handler$zmi000$carpet-tis-addition$onConstructLifeTimeTracker(CallbackInfo)
+  metoda void handler$bcj000$carpet-tis-addition$entityIdCounter_onEntityInited(CallbackInfo)
+  metoda Vec3 getViewVector(float)
+  metoda boolean isVisuallySwimming()
+  metoda boolean isAlwaysTicking()
+  metoda Vec3 getEyePosition(float)
+  metoda Vec3 getEyePosition()
+  metoda DamageSources damageSources()
+  metoda Vec3 getRopeHoldPosition(float)
+  metoda boolean shouldBeSaved()
+  metoda HoverEvent createHoverEvent()
+  metoda boolean isPermanentVehicle()
+  metoda EntityEventsGroup getEventContainer()
+  metoda void animateHurt(float)
+  metoda boolean isCrouching()
+  metoda void setComponent(DataComponentType, Object)
+  metoda void hurt(DamageSource, float)
+  metoda void dismountTo(double, double, double)
+  metoda float getAirDrag()
+  metoda double getGravity()
+  metoda boolean isFree(double, double, double)
+  metoda boolean isFree(AABB)
+  metoda boolean isVehicle()
+  metoda boolean isInLava()
+  metoda float getBbWidth()
+  metoda Holder typeHolder()
+  metoda void absSnapTo(double, double, double)
+  metoda void absSnapTo(double, double, double, float, float)
+  metoda boolean isPushable()
+  metoda Pose getPose()
+  metoda boolean teleportTo(ServerLevel, double, double, double, Set, float, float, boolean)
+  metoda void teleportTo(double, double, double)
+  metoda boolean canFreeze()
+  metoda float distanceTo(Entity)
+  metoda boolean hasPose(Pose)
+  metoda void setXRot(float)
+  metoda void lerpHeadTo(float, int)
+  metoda void unRide()
+  metoda Set entityTags()
+  metoda boolean addTag(String)
+  metoda float nextStep()
+  metoda boolean isInRain()
+  metoda boolean fireImmune()
+  metoda boolean isOnRails()
+  metoda void setRemoved(RemovalReason)
+  metoda boolean isFreezing()
+  metoda boolean isFlapping()
+  metoda void lavaHurt()
+  metoda void setRot(float, float)
+  metoda BlockPos getOnPos(float)
+  metoda BlockPos getOnPos()
+  metoda boolean closerThan(Entity, double, double)
+  metoda boolean closerThan(Entity, double)
+  metoda void setPosRaw(double, double, double)
+  metoda void onFlap()
+  metoda boolean isOnFire()
+  metoda void lavaIgnite()
+  metoda void turn(double, double)
+  metoda void setOldPos()
+  metoda void setOldPos(Vec3)
+  metoda Entity teleport(TeleportTransition)
+  metoda int getBlockX()
+  metoda boolean isInFluid(TagKey)
+  metoda void setOldRot(float, float)
+  metoda void setOldRot()
+  metoda Vec3 getForward()
+  metoda void snapTo(BlockPos, float, float)
+  metoda void snapTo(double, double, double, float, float)
+  metoda void snapTo(double, double, double)
+  metoda void snapTo(Vec3, float, float)
+  metoda void snapTo(Vec3)
+  metoda boolean isInClouds()
+  metoda int getBlockZ()
+  metoda void setSilent(boolean)
+  metoda boolean hurtClient(DamageSource)
+  metoda boolean canRide(Entity)
+  metoda float getMainYaw(float)
+  metoda ProjectileDeflection deflection(Projectile)
+  metoda void lerpMotion(Vec3)
+  metoda void thunderHit(ServerLevel, LightningBolt)
+  metoda float mirror(Mirror)
+  metoda int getBlockY()
+  metoda void setRemainingFireTicks(int)
+  metoda MovementEmission getMovementEmission()
+  metoda String getScoreboardName()
+  metoda boolean shouldShowName()
+  metoda boolean isPushedByFluid()
+  metoda SynchedEntityData getEntityData()
+  metoda SoundEvent getSwimHighSpeedSplashSound()
+
+=== net.minecraft.client.renderer.GameRenderer
+  pole   Identifier BLUR_POST_CHAIN_ID
+  pole   int MAX_BLUR_RADIUS
+  pole   Logger LOGGER
+  pole   float PROJECTION_3D_HUD_Z_FAR
+  pole   float PORTAL_SPINNING_SPEED
+  pole   float NAUSEA_SPINNING_SPEED
+  pole   Minecraft minecraft
+  pole   GameRenderState gameRenderState
+  pole   RandomSource random
+  pole   ItemInHandRenderer itemInHandRenderer
+  pole   ScreenEffectRenderer screenEffectRenderer
+  pole   DebugCrosshairRenderer debugCrosshairRenderer
+  pole   RenderBuffers renderBuffers
+  pole   RenderTarget mainRenderTarget
+  pole   float spinningEffectTime
+  pole   float spinningEffectSpeed
+  pole   float bossOverlayWorldDarkening
+  pole   float bossOverlayWorldDarkeningO
+  pole   boolean renderBlockOutline
+  pole   long lastScreenshotAttempt
+  pole   boolean hasWorldScreenshot
+  pole   Lightmap lightmap
+  pole   LightmapRenderStateExtractor lightmapRenderStateExtractor
+  pole   UiLightmap uiLightmap
+  pole   boolean useUiLightmap
+  pole   OverlayTexture overlayTexture
+  pole   Panorama panorama
+  pole   CrossFrameResourcePool resourcePool
+  pole   FogRenderer fogRenderer
+  pole   GuiRenderer guiRenderer
+  pole   FeatureRenderDispatcher featureRenderDispatcher
+  pole   SubmitNodeStorage handAndScreenSubmitNodeStorage
+  pole   Identifier postEffectId
+  pole   boolean effectActive
+  pole   Camera mainCamera
+  pole   Projection hudProjection
+  pole   Lighting lighting
+  pole   GlobalSettingsUniform globalSettingsUniform
+  pole   ProjectionMatrixBuffer levelProjectionMatrixBuffer
+  pole   ProjectionMatrixBuffer hud3dProjectionMatrixBuffer
+  metoda void update(DeltaTracker)
+  metoda void extract(DeltaTracker, boolean)
+  metoda void close()
+  metoda void resize(int, int)
+  metoda void tick()
+  metoda void setLevel(ClientLevel)
+  metoda void render(DeltaTracker, boolean)
+  metoda void extractOptions()
+  metoda void bobHurt(CameraRenderState, PoseStack)
+  metoda Lighting lighting()
+  metoda void resetData()
+  metoda GameRenderState gameRenderState()
+  metoda void preloadUiShader(ResourceProvider)
+  metoda RenderTarget mainRenderTarget()
+  metoda void registerPanoramaTextures(TextureManager)
+  metoda void wrapOperation$dkd000$flashback$renderItemInHand_submitHandsWithItems(ItemInHandRenderer, float, PoseStack, SubmitNodeCollector, LocalPlayer, int, Operation)
+  metoda void handler$dbm000$fabric-rendering-v1$guiRendererReady(Minecraft, ItemInHandRenderer, ModelManager, CallbackInfo)
+  metoda void handler$dkd000$flashback$tryTakeScreenshotIfNeeded(CallbackInfo)
+  metoda GameType wrapOperation$dkd000$flashback$getPlayerMode(MultiPlayerGameMode, Operation)
+  metoda void handler$dbm000$fabric-rendering-v1$beforeExtract(DeltaTracker, boolean, CallbackInfo)
+  metoda void handler$dkd000$flashback$shouldRenderBlockOutline(CallbackInfoReturnable)
+  metoda void displayItemActivation(ItemStack)
+  metoda void lambda$takeAutoScreenshot$1(NativeImage, Path)
+  metoda void lambda$takeAutoScreenshot$0(Path, NativeImage)
+  metoda GameType mixinextras$bridge$getPlayerMode$56(Object[])
+  metoda Void mixinextras$bridge$submitHandsWithItems$57(Object[])
+  metoda void handler$zzj000$betalook$betaBob(PoseStack, float, CallbackInfo)
+  metoda void handler$dkd000$flashback$render_noGui(DeltaTracker, boolean, CallbackInfo)
+  metoda void lambda$tryTakeScreenshotIfNeeded$0(Path)
+  metoda GpuTextureView lightmap()
+  metoda void bobView(CameraRenderState, PoseStack)
+  metoda Panorama panorama()
+  metoda Camera mainCamera()
+  metoda OverlayTexture overlayTexture()
+  metoda void clearPostEffect()
+  metoda Identifier currentPostEffect()
+  metoda void checkEntityPostEffect(Entity)
+  metoda void togglePostEffect()
+  metoda void renderLevel(DeltaTracker)
+  metoda void setRenderBlockOutline(boolean)
+  metoda boolean shouldRenderBlockOutline()
+  metoda void setPostEffect(Identifier)
+  metoda float nightVisionScale(LivingEntity, float)
+  metoda void renderItemInHand(CameraRenderState, float, Matrix4fc)
+  metoda void processBlurEffect()
+  metoda void extractWindow()
+  metoda float bossOverlayWorldDarkening(float)
+  metoda RenderBuffers renderBuffers()
+  metoda FeatureRenderDispatcher featureRenderDispatcher()
+  metoda void extractCamera(DeltaTracker, float, float)
+  metoda void tryTakeScreenshotIfNeeded()
+  metoda void takeAutoScreenshot(Path)
+  metoda String lambda$preloadUiShader$0(ResourceProvider, Identifier, ShaderType)
+  metoda Vec3 projectPointToScreen(Vec3)
+  metoda double projectHorizonToScreen()
+  metoda GpuTextureView levelLightmap()
+
+=== net.minecraft.client.renderer.entity.state.HumanoidRenderState
+  pole   float swimAmount
+  pole   float speedValue
+  pole   float maxCrossbowChargeDuration
+  pole   float ticksUsingItem
+  pole   InteractionHand useItemHand
+  pole   boolean isCrouching
+  pole   boolean isFallFlying
+  pole   boolean isVisuallySwimming
+  pole   boolean isPassenger
+  pole   boolean isUsingItem
+  pole   float elytraRotX
+  pole   float elytraRotY
+  pole   float elytraRotZ
+  pole   ItemStack headEquipment
+  pole   ItemStack chestEquipment
+  pole   ItemStack legsEquipment
+  pole   ItemStack feetEquipment
+  metoda float ticksUsingItem(HumanoidArm)
+
+=== net.minecraft.client.renderer.block.BlockModelLighter
+  pole   int CACHE_SIZE
+  pole   ThreadLocal CACHE
+  pole   int CHECK_LIGHT
+  pole   Cache cache
+  pole   MutableBlockPos scratchPos
+  pole   boolean faceCubic
+  pole   boolean facePartial
+  pole   float[] faceShape
+  metoda void clearCache()
+  metoda int getLightCoords(BlockState, BlockAndTintGetter, BlockPos)
+  metoda void prepareQuadShape(BlockAndTintGetter, BlockState, BlockPos, BakedQuad, boolean)
+  metoda void prepareQuadFlat(BlockAndTintGetter, BlockState, BlockPos, int, BakedQuad, QuadInstance)
+  metoda void enableCaching()
+  metoda void prepareQuadAmbientOcclusion(BlockAndTintGetter, BlockState, BlockPos, BakedQuad, QuadInstance)
+  metoda ThreadLocal fabric_getCACHE$fabric-renderer-indigo_$md$b7a083$0()
+
+=== net.minecraft.client.particle.ParticleEngine
+  pole   List RENDER_ORDER
+  pole   ClientLevel level
+  pole   Map particles
+  pole   Queue trackingEmitters
+  pole   Queue particlesToAdd
+  pole   Object2IntOpenHashMap trackedParticleCounts
+  pole   ParticleResources resourceManager
+  pole   RandomSource random
+  metoda void extract(ParticlesRenderState, Frustum, Camera, float)
+  metoda void add(Particle)
+  metoda void tick()
+  metoda void setLevel(ClientLevel)
+  metoda RandomSource getRandom()
+  metoda Particle createParticle(ParticleOptions, double, double, double, double, double, double)
+  metoda void lambda$tick$0(ParticleRenderType, ParticleGroup)
+  metoda void lambda$tick$1(ParticleLimit)
+  metoda Particle makeParticle(ParticleOptions, double, double, double, double, double, double)
+  metoda void clearParticles()
+  metoda List getParticleRenderTypes$fabric-particles-v1_$md$b7a083$0()
+  metoda void handler$coi000$fabric-particles-v1$createParticleGroup(ParticleRenderType, CallbackInfoReturnable)
+  metoda void handler$coi000$fabric-particles-v1$classInit(CallbackInfo)
+  metoda String countParticles()
+  metoda void handler$dma000$flashback$createParticle(ParticleOptions, double, double, double, double, double, double, CallbackInfoReturnable)
+  metoda void handler$dma000$flashback$extract(CallbackInfo)
+  metoda void createTrackingEmitter(Entity, ParticleOptions)
+  metoda void createTrackingEmitter(Entity, ParticleOptions, int)
+  metoda ParticleGroup createParticleGroup(ParticleRenderType)
+  metoda boolean hasSpaceInParticleLimit(ParticleLimit)
+  metoda void updateCount(ParticleLimit, int)
+
