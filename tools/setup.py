@@ -133,8 +133,11 @@ def jar_candidates(root: pathlib.Path) -> list[pathlib.Path]:
     if libs.is_dir():
         found += [j for j in libs.glob("*/*.jar") if "client" in j.name]
 
-    # Instancje z wlasnym .minecraft w srodku.
-    for pattern in ("instances/*/minecraft/versions/*/*.jar",
+    # Modrinth App: gra w meta/, profile osobno.
+    for pattern in ("meta/versions/*/*.jar",
+                    "meta/libraries/com/mojang/minecraft/*/*.jar",
+                    # Instancje z wlasnym .minecraft w srodku.
+                    "instances/*/minecraft/versions/*/*.jar",
                     "instances/*/.minecraft/versions/*/*.jar",
                     "profiles/*/versions/*/*.jar",
                     "Instances/*/versions/*/*.jar"):
@@ -311,7 +314,12 @@ def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mc-dir")
+    ap.add_argument("--mc-dir",
+                    help="katalog przeszukiwany w poszukiwaniu jarow gry")
+    ap.add_argument("--game-dir",
+                    help="katalog, do ktorego wgrac mod i pack -- profil "
+                         "launchera, gdy rozni sie od miejsca z jarami "
+                         "(Modrinth App, Prism, CurseForge)")
     ap.add_argument("--version")
     ap.add_argument("--beta")
     ap.add_argument("--dry-run", action="store_true")
@@ -353,13 +361,16 @@ def main() -> None:
             "Odpal raz czysta wersje gry w launcherze, potem powtorz.\n"
             "Albo wskaz ja wprost:  python tools/setup.py --version <nazwa>")
 
-    # mc_dir: tam, gdzie wgrywamy pack i mod. Bierzemy katalog gry, do ktorego
-    # nalezy znaleziony jar, a nie pierwszy z brzegu z listy przeszukanej.
-    mc_dir = game_jar.parent.parent.parent
-    if not (mc_dir / "resourcepacks").is_dir() and (roots[0] / "resourcepacks").is_dir():
-        mc_dir = roots[0]
-    elif not (mc_dir / "resourcepacks").is_dir():
-        mc_dir = roots[0]
+    # Gdzie wgrac mod i pack. To NIE musi byc tam, gdzie leza jary:
+    # Modrinth App trzyma gre w meta/, a mody w profiles/<nazwa>/mods.
+    if args.game_dir:
+        mc_dir = pathlib.Path(args.game_dir)
+        if not mc_dir.is_dir():
+            sys.exit(f"Nie ma takiego katalogu: {mc_dir}")
+    else:
+        mc_dir = game_jar.parent.parent.parent
+        if not (mc_dir / "resourcepacks").is_dir():
+            mc_dir = roots[0]
 
     print(f"\nJar gry:    {game_jar}")
     print(f"Minecraft:  {mc_dir}")
