@@ -29,6 +29,37 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TOOLS = ROOT / "tools"
 
+_LOG: list[str] = []
+
+
+def say(*parts: object) -> None:
+    """
+    Wypisuje na ekran i zapamietuje do logu.
+
+    Wczesniej robil to obiekt podstawiony pod sys.stdout i sys.stderr naraz.
+    Gdy zapis na konsole zawiodl, traceback szedl tym samym zepsutym kanalem
+    i skrypt konczyl sie bez slowa -- na Windowsie zdarzylo sie to dwa razy
+    z rzedu. Zwykla funkcja nie moze zepsuc strumieni calego procesu.
+    """
+    line = " ".join(str(p) for p in parts)
+    _LOG.append(line)
+    try:
+        sys.stdout.write(line + "\n")
+        sys.stdout.flush()
+    except (UnicodeEncodeError, ValueError, OSError):
+        safe = line.encode("ascii", "replace").decode("ascii")
+        try:
+            sys.stdout.write(safe + "\n")
+        except Exception:
+            pass
+
+
+def save_log(path: pathlib.Path) -> None:
+    try:
+        path.write_text("\n".join(_LOG) + "\n", encoding="utf-8")
+    except OSError:
+        pass
+
 
 def candidate_roots() -> list[pathlib.Path]:
     """
@@ -218,50 +249,9 @@ def find_beta_jar(roots: list[pathlib.Path], given: str | None) -> pathlib.Path 
 
 
 def run(script: str, *args: str) -> bool:
-    print(f"\n--- {script} {' '.join(args)}")
+    say(f"\n--- {script} {' '.join(args)}")
     result = subprocess.run([sys.executable, str(TOOLS / script), *args])
     return result.returncode == 0
-
-
-class Tee:
-    """
-    Pisze jednoczesnie na ekran i do pliku, zeby log byl zawsze pod reka.
-
-    Kazdy zapis jest osobno zabezpieczony. Konsola Windows potrafi nie
-    przyjac polskiego znaku i rzucic UnicodeEncodeError -- a gdy stderr
-    tez idzie przez Tee, traceback nie ma gdzie wyladowac i skrypt umiera
-    bez slowa. Straty pojedynczej linijki nie warto placic cisza.
-    """
-
-    def __init__(self, stream, path: pathlib.Path):
-        self.stream = stream
-        try:
-            self.file = path.open("w", encoding="utf-8")
-        except OSError:
-            self.file = None
-
-    def write(self, text: str) -> int:
-        try:
-            self.stream.write(text)
-        except (UnicodeEncodeError, ValueError):
-            self.stream.write(text.encode("ascii", "replace").decode("ascii"))
-        if self.file is not None:
-            try:
-                self.file.write(text)
-            except (OSError, ValueError):
-                self.file = None
-        return len(text)
-
-    def flush(self) -> None:
-        try:
-            self.stream.flush()
-        except (OSError, ValueError):
-            pass
-        if self.file is not None:
-            try:
-                self.file.flush()
-            except (OSError, ValueError):
-                self.file = None
 
 
 def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
@@ -272,57 +262,57 @@ def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
     Bez tego latwo wgrac komplet plikow, zobaczyc wspolczesna gre i nie
     wiedziec, ze polowa rzeczy nie miala prawa ruszyc.
     """
-    print()
-    print("=" * 60)
-    print("CO ZADZIALA")
-    print("=" * 60)
-    print("  Zawsze: ukrywanie blokow i itemow spoza bety, podstawianie")
-    print("          kamieni i ziemi, drewno renderowane jak dab.")
+    say()
+    say("=" * 60)
+    say("CO ZADZIALA")
+    say("=" * 60)
+    say("  Zawsze: ukrywanie blokow i itemow spoza bety, podstawianie")
+    say("          kamieni i ziemi, drewno renderowane jak dab.")
 
     if overlay_mode:
-        print("  Tryb nakladki: pack NIE zawiera tekstur. Poloz go NAD")
-        print("  swoim packiem z teksturami bety w Opcje -> Pakiety zasobow.")
+        say("  Tryb nakladki: pack NIE zawiera tekstur. Poloz go NAD")
+        say("  swoim packiem z teksturami bety w Opcje -> Pakiety zasobow.")
     elif beta_jar:
-        print("  Tekstury bety: TAK")
+        say("  Tekstury bety: TAK")
     elif not overlay_mode:
-        print()
-        print("  TEKSTURY BETY: NIE -- i to jest najwieksza brakujaca czesc.")
-        print("  Nie znalazlem jara bety, wiec tekstury zostaja wspolczesne.")
-        print("  Bez nich gra NIE BEDZIE wygladac jak beta, chocby mod")
-        print("  robil wszystko poprawnie.")
-        print()
-        print("  Napraw tak: launcher -> Installations -> wlacz")
-        print("  'historical versions' -> odpal raz b1.7.3 -> powtorz setup.")
+        say()
+        say("  TEKSTURY BETY: NIE -- i to jest najwieksza brakujaca czesc.")
+        say("  Nie znalazlem jara bety, wiec tekstury zostaja wspolczesne.")
+        say("  Bez nich gra NIE BEDZIE wygladac jak beta, chocby mod")
+        say("  robil wszystko poprawnie.")
+        say()
+        say("  Napraw tak: launcher -> Installations -> wlacz")
+        say("  'historical versions' -> odpal raz b1.7.3 -> powtorz setup.")
 
-    print()
-    print("  Reszta (mgla, swiatlo, niebo, animacje, czastki, chmury)")
-    print("  wymaga, zeby mod sie zaladowal -- patrz nizej.")
+    say()
+    say("  Reszta (mgla, swiatlo, niebo, animacje, czastki, chmury)")
+    say("  wymaga, zeby mod sie zaladowal -- patrz nizej.")
 
     target = mod_target_version()
     launched = game_jar.parent.name
     if target and launched != target:
-        print()
-        print(f"  UWAGA: mod jest zbudowany pod {target}, a uzyty jar to")
-        print(f"  {launched}. Jesli grasz na innej wersji niz ta, pod ktora")
-        print("  zbudowales mod, Fabric moze go w ogole nie zaladowac.")
+        say()
+        say(f"  UWAGA: mod jest zbudowany pod {target}, a uzyty jar to")
+        say(f"  {launched}. Jesli grasz na innej wersji niz ta, pod ktora")
+        say("  zbudowales mod, Fabric moze go w ogole nie zaladowac.")
 
     log = mc_dir / "logs" / "latest.log"
-    print()
-    print("=" * 60)
-    print("OSTATNIE URUCHOMIENIE GRY")
-    print("=" * 60)
+    say()
+    say("=" * 60)
+    say("OSTATNIE URUCHOMIENIE GRY")
+    say("=" * 60)
     if not log.is_file():
-        print("  Brak logs/latest.log -- gra jeszcze nie startowala.")
+        say("  Brak logs/latest.log -- gra jeszcze nie startowala.")
     else:
         text = log.read_text(encoding="utf-8", errors="replace")
         if "BetaLook zaladowany" in text:
-            print("  Mod sie zaladowal.")
+            say("  Mod sie zaladowal.")
         else:
-            print("  MOD SIE NIE ZALADOWAL. Nic z mgly, swiatla ani nieba")
-            print("  nie mialo prawa zadzialac. Najczestsze powody:")
-            print("    - brak Fabric API w folderze mods")
-            print("    - gra odpalona na innej wersji niz mod")
-            print("    - gra odpalona bez profilu Fabric")
+            say("  MOD SIE NIE ZALADOWAL. Nic z mgly, swiatla ani nieba")
+            say("  nie mialo prawa zadzialac. Najczestsze powody:")
+            say("    - brak Fabric API w folderze mods")
+            say("    - gra odpalona na innej wersji niz mod")
+            say("    - gra odpalona bez profilu Fabric")
 
         for marker, message in (
                 ("Mixin apply", "  Blad mixina -- wklej latest.log."),
@@ -330,13 +320,13 @@ def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
                 ("Chmury: ", "  Chmury nie trafily w pole wysokosci."),
         ):
             if marker in text:
-                print(message)
+                say(message)
 
     classes = mc_dir / "config" / "betalook-classes.txt"
     if classes.is_file():
-        print()
-        print(f"  Powstal zrzut klas: {classes}")
-        print("  Znaczy to, ze ktorys modul czegos nie znalazl.")
+        say()
+        say(f"  Powstal zrzut klas: {classes}")
+        say("  Znaczy to, ze ktorys modul czegos nie znalazl.")
 
 
 def main() -> None:
@@ -363,12 +353,10 @@ def main() -> None:
         saved = remembered.read_text(encoding="utf-8").strip()
         if saved and pathlib.Path(saved).is_dir():
             args.game_dir = saved
-            print(f"Uzywam zapamietanego profilu: {saved}")
-            print("(zmienisz go przez --game-dir)")
+            say(f"Uzywam zapamietanego profilu: {saved}")
+            say("(zmienisz go przez --game-dir)")
 
     log_path = ROOT / "setup-log.txt"
-    sys.stdout = Tee(sys.__stdout__, log_path)
-    sys.stderr = sys.stdout
 
     if args.mc_dir:
         roots = [pathlib.Path(args.mc_dir)]
@@ -383,20 +371,20 @@ def main() -> None:
             "Wskaz katalog recznie:\n"
             "  python tools/setup.py --mc-dir \"<sciezka>\"")
 
-    print("Przeszukane:")
+    say("Przeszukane:")
     for r in roots:
-        print(f"  {r}")
+        say(f"  {r}")
 
     game_jar = find_game_jar(roots, args.version)
     if game_jar is None:
-        print("\nZnalezione jary (zaden nie zawiera assetow gry):")
+        say("\nZnalezione jary (zaden nie zawiera assetow gry):")
         any_jar = False
         for root in roots:
             for jar in jar_candidates(root):
-                print(f"  {jar}")
+                say(f"  {jar}")
                 any_jar = True
         if not any_jar:
-            print("  (zadnych)")
+            say("  (zadnych)")
         sys.exit(
             "\nJary modloaderow nie zawieraja assetow -- potrzebny waniliowy.\n"
             "Odpal raz czysta wersje gry w launcherze, potem powtorz.\n"
@@ -413,19 +401,19 @@ def main() -> None:
         if not (mc_dir / "resourcepacks").is_dir():
             mc_dir = roots[0]
 
-    print(f"\nJar gry:    {game_jar}")
-    print(f"Minecraft:  {mc_dir}")
+    say(f"\nJar gry:    {game_jar}")
+    say(f"Minecraft:  {mc_dir}")
 
     if args.hide_only:
         beta_jar = None
-        print("Tryb: NAKLADKA -- samo ukrywanie, bez tekstur.")
+        say("Tryb: NAKLADKA -- samo ukrywanie, bez tekstur.")
     else:
         beta_jar = find_beta_jar(roots, args.beta)
-        print(f"Jar bety:   "
+        say(f"Jar bety:   "
               f"{beta_jar if beta_jar else '(brak -- tekstury zostana wspolczesne)'}")
 
     if args.dry_run:
-        print("\n--dry-run: nic nie zapisuje.")
+        say("\n--dry-run: nic nie zapisuje.")
         return
 
     # Sprzatamy to, co wygenerowal poprzedni przebieg. Bez tego tekstury
@@ -436,7 +424,7 @@ def main() -> None:
         target = generated / folder
         if target.is_dir():
             shutil.rmtree(target)
-            print(f"Usunieto stare: {target}")
+            say(f"Usunieto stare: {target}")
 
     hide_args = ["--overlay"] if args.hide_only else []
     if not run("gen_hide_pack.py", str(game_jar), *hide_args):
@@ -451,7 +439,7 @@ def main() -> None:
         pack_name = "BetaLook.zip"
         build_args = []
         if beta_jar and not run("extract_beta_textures.py", str(beta_jar)):
-            print("UWAGA: wyciaganie tekstur nie przeszlo, ide dalej bez nich.")
+            say("UWAGA: wyciaganie tekstur nie przeszlo, ide dalej bez nich.")
 
     if not run("build_pack.py", *build_args):
         sys.exit("build_pack.py nie przeszedl -- przerywam.")
@@ -462,9 +450,9 @@ def main() -> None:
     shutil.copy2(ROOT / "build" / pack_name, installed)
     if not installed.is_file():
         sys.exit(f"Kopiowanie nie powiodlo sie: {installed}")
-    print()
-    print(f"Pack wgrany:  {installed}")
-    print(f"              ({installed.stat().st_size // 1024} KB)")
+    say()
+    say(f"Pack wgrany:  {installed}")
+    say(f"              ({installed.stat().st_size // 1024} KB)")
 
     mod_jars = sorted((ROOT / "build" / "libs").glob("betalook-*.jar")) \
         if (ROOT / "build" / "libs").is_dir() else []
@@ -473,25 +461,27 @@ def main() -> None:
         mods = mc_dir / "mods"
         mods.mkdir(parents=True, exist_ok=True)
         shutil.copy2(mod_jars[-1], mods / mod_jars[-1].name)
-        print(f"Mod wgrany:   {mods / mod_jars[-1].name}")
+        say(f"Mod wgrany:   {mods / mod_jars[-1].name}")
     else:
-        print("Mod:          nie zbudowany (uruchom gradlew build) -- pomijam")
+        say("Mod:          nie zbudowany (uruchom gradlew build) -- pomijam")
 
     report(mc_dir, game_jar, beta_jar, args.hide_only)
-    print()
-    print(f"Caly ten log zapisalem tez w: {log_path}")
+    say()
+    say(f"Caly ten log zapisalem tez w: {log_path}")
+    save_log(log_path)
 
 
 if __name__ == "__main__":
     try:
         main()
     except SystemExit:
+        # Zwykle zakonczenie z komunikatem -- bez tracebacku.
         raise
     except BaseException:
-        # Traceback na PRAWDZIWY stderr. Gdyby poszedl przez Tee i ten
-        # tez byl zepsuty, blad znikalby bez sladu -- a wlasnie wtedy
-        # jest najbardziej potrzebny.
         import traceback
-        traceback.print_exc(file=sys.__stderr__)
-        sys.__stderr__.flush()
+        traceback.print_exc()
         raise
+    finally:
+        # Log musi powstac takze wtedy, gdy skrypt przerwal w polowie --
+        # wlasnie wtedy jest najbardziej potrzebny.
+        save_log(ROOT / "setup-log.txt")
