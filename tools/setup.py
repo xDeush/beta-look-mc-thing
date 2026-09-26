@@ -331,6 +331,17 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
 
+    # Zapamietany profil launchera. Podajesz --game-dir raz, potem juz nie.
+    remembered = ROOT / ".betalook-game-dir"
+    if args.game_dir:
+        remembered.write_text(args.game_dir, encoding="utf-8")
+    elif remembered.is_file():
+        saved = remembered.read_text(encoding="utf-8").strip()
+        if saved and pathlib.Path(saved).is_dir():
+            args.game_dir = saved
+            print(f"Uzywam zapamietanego profilu: {saved}")
+            print("(zmienisz go przez --game-dir)")
+
     log_path = ROOT / "setup-log.txt"
     sys.stdout = Tee(sys.__stdout__, log_path)
     sys.stderr = sys.stdout

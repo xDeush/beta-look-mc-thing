@@ -8,3 +8,4 @@ run/
 # Tekstury wypakowane z wlasnego jara bety -- nie trafiaja do repo.
 resourcepack/assets/minecraft/textures/
 setup-log.txt
+.betalook-game-dir
