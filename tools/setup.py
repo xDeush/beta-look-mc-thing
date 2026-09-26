@@ -233,7 +233,11 @@ def find_game_jar(roots: list[pathlib.Path], wanted: str | None) -> pathlib.Path
     if target:
         exact = [j for j in vanilla if base_version(j.parent.name) == target]
         if exact:
-            return exact[0]
+            # Wsrod pasujacych wolimy wydanie stabilne. "26.2-snapshot-6"
+            # i "26.2-0.19.5" maja te sama wersje bazowa, ale to snapshot
+            # ma inna liste blokow niz gra, na ktorej naprawde grasz.
+            stable_exact = [j for j in exact if not is_snapshot(j.parent.name)]
+            return (stable_exact or exact)[0]
 
     # Potem stabilne wydania, dopiero na koncu snapshoty.
     stable = [j for j in vanilla if not is_snapshot(j.parent.name)]
