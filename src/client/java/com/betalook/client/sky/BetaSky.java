@@ -39,8 +39,26 @@ public final class BetaSky {
      */
     public static int skyColor(float temperature, float celestialAngle) {
         float daylight = (float) Math.cos(celestialAngle * Math.PI * 2.0D) * 2.0F + 0.5F;
-        daylight = clamp(daylight, 0.0F, 1.0F);
+        return skyColorWithDaylight(temperature, clamp(daylight, 0.0F, 1.0F));
+    }
 
+    /**
+     * Jasnosc dnia odczytana z koloru, ktory policzyla vanilla.
+     *
+     * Najmocniejszy kanal waniliowego nieba idzie w gore i w dol razem z pora
+     * dnia i pogoda. Dzieki temu nie musimy wolac zadnego API czasu -- a to
+     * wlasnie te metody Mojang przenosi i przemianowuje najczesciej.
+     */
+    public static float daylightFromVanillaSky(int vanillaRgb) {
+        int r = (vanillaRgb >> 16) & 0xFF;
+        int g = (vanillaRgb >> 8) & 0xFF;
+        int b = vanillaRgb & 0xFF;
+        return Math.max(Math.max(r, g), b) / 255.0F;
+    }
+
+    /** Barwa biomu przyciemniona zadanym wspolczynnikiem 0..1. */
+    public static int skyColorWithDaylight(float temperature, float daylight) {
+        daylight = clamp(daylight, 0.0F, 1.0F);
         int base = skyColorByTemperature(temperature);
         int r = (int) (((base >> 16) & 0xFF) * daylight);
         int g = (int) (((base >> 8) & 0xFF) * daylight);

@@ -141,6 +141,15 @@ public class BetaMathTest {
         int duskB = dusk & 0xFF;
         check("zmierzch jest posredni (B=" + duskB + ")", duskB > 0 && duskB < 250);
 
+        // Jasnosc odczytana z waniliowego koloru zamiast z API czasu.
+        check("jasne niebo -> wspolczynnik 1",
+                Math.abs(BetaSky.daylightFromVanillaSky(0x78A7FF) - 1.0F) < 0.01F);
+        check("czarne niebo -> wspolczynnik 0",
+                BetaSky.daylightFromVanillaSky(0x000000) == 0.0F);
+        int dimmed = BetaSky.skyColorWithDaylight(0.0F, 0.5F);
+        check("polowa jasnosci polowi kanaly (B=" + (dimmed & 0xFF) + ")",
+                (dimmed & 0xFF) == 127);
+
         // Konwersja HSV: pelna jasnosc i zero nasycenia to biel.
         check("HSV(dowolny, 0, 1) == biel", BetaSky.hsvToRgb(0.3F, 0.0F, 1.0F) == 0xFFFFFF);
         check("HSV(dowolny, dowolny, 0) == czern", BetaSky.hsvToRgb(0.3F, 1.0F, 0.0F) == 0);
