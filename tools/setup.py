@@ -224,20 +224,44 @@ def run(script: str, *args: str) -> bool:
 
 
 class Tee:
-    """Pisze jednoczesnie na ekran i do pliku, zeby log byl zawsze pod reka."""
+    """
+    Pisze jednoczesnie na ekran i do pliku, zeby log byl zawsze pod reka.
+
+    Kazdy zapis jest osobno zabezpieczony. Konsola Windows potrafi nie
+    przyjac polskiego znaku i rzucic UnicodeEncodeError -- a gdy stderr
+    tez idzie przez Tee, traceback nie ma gdzie wyladowac i skrypt umiera
+    bez slowa. Straty pojedynczej linijki nie warto placic cisza.
+    """
 
     def __init__(self, stream, path: pathlib.Path):
         self.stream = stream
-        self.file = path.open("w", encoding="utf-8")
+        try:
+            self.file = path.open("w", encoding="utf-8")
+        except OSError:
+            self.file = None
 
     def write(self, text: str) -> int:
-        self.stream.write(text)
-        self.file.write(text)
+        try:
+            self.stream.write(text)
+        except (UnicodeEncodeError, ValueError):
+            self.stream.write(text.encode("ascii", "replace").decode("ascii"))
+        if self.file is not None:
+            try:
+                self.file.write(text)
+            except (OSError, ValueError):
+                self.file = None
         return len(text)
 
     def flush(self) -> None:
-        self.stream.flush()
-        self.file.flush()
+        try:
+            self.stream.flush()
+        except (OSError, ValueError):
+            pass
+        if self.file is not None:
+            try:
+                self.file.flush()
+            except (OSError, ValueError):
+                self.file = None
 
 
 def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
@@ -434,8 +458,13 @@ def main() -> None:
 
     packs = mc_dir / "resourcepacks"
     packs.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT / "build" / pack_name, packs / pack_name)
-    print(f"\nPack wgrany:  {packs / pack_name}")
+    installed = packs / pack_name
+    shutil.copy2(ROOT / "build" / pack_name, installed)
+    if not installed.is_file():
+        sys.exit(f"Kopiowanie nie powiodlo sie: {installed}")
+    print()
+    print(f"Pack wgrany:  {installed}")
+    print(f"              ({installed.stat().st_size // 1024} KB)")
 
     mod_jars = sorted((ROOT / "build" / "libs").glob("betalook-*.jar")) \
         if (ROOT / "build" / "libs").is_dir() else []
@@ -454,4 +483,15 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except BaseException:
+        # Traceback na PRAWDZIWY stderr. Gdyby poszedl przez Tee i ten
+        # tez byl zepsuty, blad znikalby bez sladu -- a wlasnie wtedy
+        # jest najbardziej potrzebny.
+        import traceback
+        traceback.print_exc(file=sys.__stderr__)
+        sys.__stderr__.flush()
+        raise
