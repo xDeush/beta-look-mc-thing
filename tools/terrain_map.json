@@ -1,5 +1,5 @@
 {
-  "_comment": "Indeks kafla w terrain.png (b1.7.3, siatka 16x16 kafli po 16px) -> sciezka tekstury we wspolczesnym resourcepacku. Niepokryte indeksy sa pomijane; dopisuj je tutaj.",
+  "_comment": "Indeks kafla w terrain.png (b1.7.3, siatka 16x16 kafli po 16px) -> sciezka tekstury we wspolczesnym resourcepacku. Liscie: 52 to wersja fancy (z dziurami), 53 to fast (pelna). Domyslnie uzywamy 53. Zmiana: przestaw block/oak_leaves na 52. Podglad numerow: python3 tools/index_atlas.py <jar> ",
   "0": "block/grass_block_top",
   "1": "block/stone",
   "2": "block/dirt",
@@ -37,9 +37,7 @@
   "48": "block/lapis_ore",
   "49": "block/lapis_block",
   "50": "block/dispenser_front",
-  "51": "block/sandstone_top",
-  "52": "block/sandstone",
-  "53": "block/sandstone_bottom",
+  "53": "block/oak_leaves",
   "54": "block/note_block",
   "55": "block/white_wool",
   "58": "block/spawner",
@@ -50,7 +48,6 @@
   "63": "block/cactus_side",
   "64": "block/diamond_ore",
   "65": "block/redstone_ore",
-  "66": "block/oak_leaves",
   "68": "block/dead_bush",
   "69": "block/sugar_cane",
   "70": "block/cactus_bottom",
@@ -89,5 +86,8 @@
   "138": "block/wheat_stage4",
   "139": "block/wheat_stage5",
   "140": "block/wheat_stage6",
-  "141": "block/wheat_stage7"
+  "141": "block/wheat_stage7",
+  "176": "block/sandstone_top",
+  "192": "block/sandstone",
+  "208": "block/sandstone_bottom"
 }

@@ -46,6 +46,12 @@ def tint(image: Image.Image, color: tuple[int, int, int]) -> Image.Image:
 
 
 def leaf_tile_index() -> int:
+    """
+    Numer kafelka lisci -- z terrain_map.json, zeby byl JEDEN.
+
+    Gdy poprawisz go tam (np. z 53 na 52, czyli z fast na fancy),
+    zazielenione liscie wisni zmienia sie razem z reszta.
+    """
     mapping = json.loads((ROOT / "tools" / "terrain_map.json").read_text())
     for key, value in mapping.items():
         if key.isdigit() and value == "block/oak_leaves":
