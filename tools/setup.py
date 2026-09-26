@@ -237,6 +237,78 @@ class Tee:
         self.file.flush()
 
 
+def report(mc_dir: pathlib.Path, game_jar: pathlib.Path,
+           beta_jar: pathlib.Path | None) -> None:
+    """
+    Mowi wprost, co zadziala, a co nie.
+
+    Bez tego latwo wgrac komplet plikow, zobaczyc wspolczesna gre i nie
+    wiedziec, ze polowa rzeczy nie miala prawa ruszyc.
+    """
+    print()
+    print("=" * 60)
+    print("CO ZADZIALA")
+    print("=" * 60)
+    print("  Zawsze: ukrywanie blokow i itemow spoza bety, podstawianie")
+    print("          kamieni i ziemi, drewno renderowane jak dab.")
+
+    if beta_jar:
+        print("  Tekstury bety: TAK")
+    else:
+        print()
+        print("  TEKSTURY BETY: NIE -- i to jest najwieksza brakujaca czesc.")
+        print("  Nie znalazlem jara bety, wiec tekstury zostaja wspolczesne.")
+        print("  Bez nich gra NIE BEDZIE wygladac jak beta, chocby mod")
+        print("  robil wszystko poprawnie.")
+        print()
+        print("  Napraw tak: launcher -> Installations -> wlacz")
+        print("  'historical versions' -> odpal raz b1.7.3 -> powtorz setup.")
+
+    print()
+    print("  Reszta (mgla, swiatlo, niebo, animacje, czastki, chmury)")
+    print("  wymaga, zeby mod sie zaladowal -- patrz nizej.")
+
+    target = mod_target_version()
+    launched = game_jar.parent.name
+    if target and launched != target:
+        print()
+        print(f"  UWAGA: mod jest zbudowany pod {target}, a uzyty jar to")
+        print(f"  {launched}. Jesli grasz na innej wersji niz ta, pod ktora")
+        print("  zbudowales mod, Fabric moze go w ogole nie zaladowac.")
+
+    log = mc_dir / "logs" / "latest.log"
+    print()
+    print("=" * 60)
+    print("OSTATNIE URUCHOMIENIE GRY")
+    print("=" * 60)
+    if not log.is_file():
+        print("  Brak logs/latest.log -- gra jeszcze nie startowala.")
+    else:
+        text = log.read_text(encoding="utf-8", errors="replace")
+        if "BetaLook zaladowany" in text:
+            print("  Mod sie zaladowal.")
+        else:
+            print("  MOD SIE NIE ZALADOWAL. Nic z mgly, swiatla ani nieba")
+            print("  nie mialo prawa zadzialac. Najczestsze powody:")
+            print("    - brak Fabric API w folderze mods")
+            print("    - gra odpalona na innej wersji niz mod")
+            print("    - gra odpalona bez profilu Fabric")
+
+        for marker, message in (
+                ("Mixin apply", "  Blad mixina -- wklej latest.log."),
+                ("Lightmapa: nie znalazlem", "  Lightmapa nie trafila w pole."),
+                ("Chmury: ", "  Chmury nie trafily w pole wysokosci."),
+        ):
+            if marker in text:
+                print(message)
+
+    classes = mc_dir / "config" / "betalook-classes.txt"
+    if classes.is_file():
+        print()
+        print(f"  Powstal zrzut klas: {classes}")
+        print("  Znaczy to, ze ktorys modul czegos nie znalazl.")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mc-dir")
@@ -334,14 +406,7 @@ def main() -> None:
     else:
         print("Mod:          nie zbudowany (uruchom gradlew build) -- pomijam")
 
-    print()
-    print("Zostalo tylko wlaczyc pack w grze:")
-    print("  Opcje -> Pakiety zasobow -> przesun BetaLook na prawa strone")
-    if not beta_jar:
-        print()
-        print("Tekstur bety nie znalazlem. Odpal raz b1.7.3 w launcherze")
-        print("(Installations -> wlacz 'historical versions'), potem powtorz.")
-
+    report(mc_dir, game_jar, beta_jar)
     print()
     print(f"Caly ten log zapisalem tez w: {log_path}")
 
